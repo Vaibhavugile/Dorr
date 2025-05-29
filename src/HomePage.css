@@ -1,0 +1,775 @@
+/* Base Styles */
+.home-page {
+    min-height: 100vh;
+    background-color: #fafafa; /* neutral-50 */
+    font-family: 'Inter', sans-serif;
+    color: #374151; /* gray-800 */
+    overflow-x: hidden; /* Prevent horizontal scroll due to animations */
+    scroll-behavior: smooth; /* Smooth scrolling for anchor links */
+}
+
+/* Container for consistent width */
+.container {
+    max-width: 1280px; /* Equivalent to max-w-7xl */
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem; /* px-4 */
+    padding-right: 1rem; /* px-4 */
+}
+
+/* --- Existing Animations (keep them) --- */
+@keyframes slow-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.animate-slow-spin {
+    animation: slow-spin 10s linear infinite;
+}
+
+@keyframes pulse-custom {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .5; }
+}
+.animate-pulse-custom {
+    animation: pulse-custom 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+
+/* --- NEW & ENHANCED ANIMATIONS --- */
+
+/* 1. Scroll Reveal (Fade In Up) */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(32px); /* 2rem * 16px/rem = 32px */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.animate-fade-in-up {
+    /* Set initial state for the element before it becomes visible */
+    opacity: 0;
+    transform: translateY(32px);
+    /* Animation applied by JS hook when visible */
+    animation: fadeInUp 0.8s ease-out forwards;
+    /* transition needed if JS removes/adds class, or for sequential delays */
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+/* 2. Scroll Reveal (Fade In) */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+.animate-fade-in {
+    opacity: 0; /* Initial state */
+    animation: fadeIn 0.8s ease-out forwards;
+    transition: opacity 0.8s ease-out; /* For sequential delays if needed */
+}
+
+/* 3. Pop In (for cards) */
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+.animate-pop-in {
+    opacity: 0; /* Initial state */
+    transform: scale(0.9); /* Initial state */
+    animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; /* Cubic-bezier for a bouncy feel */
+}
+
+/* 4. Button Press Feedback (already good) */
+@keyframes buttonPress {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.98); }
+    100% { transform: scale(1); }
+}
+.animate-button-press {
+    transition: transform 0.15s ease-out; /* Smoother initial press */
+}
+.animate-button-press:active {
+    animation: buttonPress 0.2s ease-out; /* Apply on active state */
+}
+
+/* 5. Social Icon Pop/Jiggle (already good) */
+@keyframes socialPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+.animate-social-pop {
+    transition: transform 0.2s ease-out;
+}
+.animate-social-pop:hover {
+    animation: socialPop 0.3s ease-out;
+}
+
+/* 6. Footer Link Hover (Slide and Fade) (already good) */
+.animate-footer-link-hover {
+    transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+}
+.animate-footer-link-hover:hover {
+    transform: translateX(5px);
+    opacity: 0.8;
+}
+
+/* --- New Button Hover Animation (Lift and Shadow) --- */
+.btn {
+    /* ... existing styles ... */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+.btn:hover {
+    /* ... existing styles ... */
+    background-color: #be185d; /* pink-700 */
+    box-shadow: 0 8px 10px -1px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05),
+                0 0 15px rgba(219, 39, 119, 0.4); /* Added soft glow */
+    transform: translateY(-2px); /* Slight lift */
+}
+
+/* --- Header --- */
+.header {
+    background-color: #f5f5f5; /* neutral-100 */
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    transition: box-shadow 0.3s ease;
+}
+
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1rem; /* py-4 */
+    padding-bottom: 1rem; /* py-4 */
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.header-logo {
+    font-size: 1.5rem; /* text-2xl */
+    font-weight: 700; /* font-bold */
+    color: #171717; /* neutral-900 */
+    text-decoration: none;
+    transition: transform 0.2s ease; /* Added for hover */
+}
+.header-logo:hover {
+    transform: scale(1.02); /* Subtle scale on hover */
+}
+
+
+.header-nav-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.desktop-nav {
+    display: none; /* hidden by default on mobile */
+    gap: 2rem; /* space-x-8 */
+}
+
+.nav-link {
+    position: relative;
+    color: #4b5563; /* gray-600 */
+    transition: color 0.3s ease;
+    text-decoration: none;
+}
+
+.nav-link:hover {
+    color: #db2777; /* pink-700 */
+}
+
+.nav-link-underline {
+    content: '';
+    position: absolute;
+    bottom: -2px; /* Adjusted to be slightly below text */
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #db2777; /* pink-700 */
+    transition: width 0.3s ease;
+}
+
+/* Apply underline on group hover */
+.nav-link:hover .nav-link-underline {
+    width: 100%;
+}
+
+.mobile-menu-button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: #4b5563; /* gray-600 */
+    transition: transform 0.3s ease, color 0.3s ease;
+    font-size: 1.5rem; /* for SVG icon sizing */
+    display: block; /* always visible on mobile */
+}
+
+.mobile-menu-button:hover {
+    color: #db2777; /* pink-700 */
+}
+
+.mobile-menu-button:focus {
+    outline: none;
+}
+
+.mobile-menu-button .icon-size {
+    width: 1.5rem; /* w-6 */
+    height: 1.5rem; /* h-6 */
+}
+
+.mobile-menu-button.rotate-90 {
+    transform: rotate(90deg);
+}
+
+.mobile-nav {
+    background-color: #f5f5f5; /* neutral-100 */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-lg */
+    padding: 1rem; /* py-4 px-4 */
+    display: block; /* always block on mobile when open */
+}
+
+.mobile-nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* space-y-4 */
+}
+
+.mobile-nav-item {
+    display: block;
+    color: #374151; /* gray-700 */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.mobile-nav-item:hover {
+    color: #db2777; /* pink-700 */
+}
+
+/* --- Sections Common Styles --- */
+.section {
+    padding-top: 4rem; /* py-16 */
+    padding-bottom: 4rem; /* py-16 */
+    border-radius: 1.5rem; /* rounded-3xl */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+    margin-left: 1rem; /* mx-4 */
+    margin-right: 1rem; /* mx-4 */
+    margin-top: 2rem; /* mt-8 */
+    position: relative;
+    z-index: 20;
+    /* Ensure elements are initially off-screen or transparent for scroll animations */
+    /* Handled by animate-fade-in-up/animate-fade-in classes now */
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out; /* Default transition for elements managed by isVisible */
+}
+
+.section-title {
+    font-size: 2.25rem; /* text-3xl */
+    font-weight: 700; /* font-bold */
+    text-align: center;
+    margin-bottom: 3rem; /* mb-12 */
+    color: #171717; /* gray-900 */
+    /* Add for sequential reveal within the section */
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.7s ease-out 0.2s, transform 0.7s ease-out 0.2s; /* Delayed fade in */
+}
+
+.section.animate-fade-in-up .section-title,
+.section.animate-fade-in .section-title {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+.section-description { /* for Men/Women sections */
+    text-align: center;
+    font-size: 1.125rem; /* text-lg */
+    color: #4b5563; /* gray-600 */
+    margin-bottom: 3rem; /* mb-12 */
+    max-width: 42rem; /* max-w-2xl */
+    margin-left: auto;
+    margin-right: auto;
+    /* Add for sequential reveal within the section */
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.7s ease-out 0.3s, transform 0.7s ease-out 0.3s; /* More delayed fade in */
+}
+
+.section.animate-fade-in-up .section-description,
+.section.animate-fade-in .section-description {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.section-description-sub { /* for Style Advisor/About Us sections */
+    text-align: center;
+    font-size: 1.125rem; /* text-lg */
+    color: #4b5563; /* gray-700 */
+    margin-bottom: 1.5rem; /* mb-6 */
+    max-width: 42rem; /* max-w-2xl */
+    margin-left: auto;
+    margin-right: auto;
+     /* Add for sequential reveal within the section */
+     opacity: 0;
+     transform: translateY(20px);
+     transition: opacity 0.7s ease-out 0.35s, transform 0.7s ease-out 0.35s; /* More delayed fade in */
+}
+.section-description-sub:last-of-type { /* Remove bottom margin from last paragraph if within same container */
+    margin-bottom: 0;
+}
+.section.animate-fade-in-up .section-description-sub,
+.section.animate-fade-in .section-description-sub {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+/* --- Grid Layouts --- */
+.grid-3-col {
+    display: grid;
+    grid-template-columns: 1fr; /* Default to single column */
+    gap: 2rem; /* gap-8 */
+}
+.grid-4-col {
+    display: grid;
+    grid-template-columns: 1fr; /* Default to single column */
+    gap: 2rem; /* gap-8 */
+}
+.grid-5-col {
+    display: grid;
+    grid-template-columns: 1fr; /* Default to single column */
+    gap: 2rem; /* gap-8 */
+}
+
+/* --- Store Card styles --- */
+.store-card {
+    background-color: #fafafa; /* neutral-50 */
+    padding: 1.5rem; /* p-6 */
+    border-radius: 0.75rem; /* rounded-xl */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-lg */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Added box-shadow transition */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+.store-card:hover {
+    transform: scale(1.03); /* Slightly reduced scale for combined effect */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05),
+                0 0 20px rgba(219, 39, 119, 0.2); /* Enhanced shadow with subtle glow */
+}
+.store-card-image {
+    width: 100%;
+    height: 8rem; /* h-32 */
+    object-fit: cover;
+    object-position: center;
+    border-radius: 0.375rem; /* rounded-md */
+    margin-bottom: 1rem; /* mb-4 */
+}
+
+.card-title {
+    font-size: 1.25rem; /* text-xl */
+    font-weight: 600; /* font-semibold */
+    color: #171717; /* gray-900 */
+    margin-bottom: 0.5rem; /* mb-2 */
+}
+
+
+/* --- Image Slider --- */
+.slider-container {
+    position: relative;
+    width: 100%;
+    max-width: 80rem; /* max-w-5xl */
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 0.75rem; /* rounded-xl */
+    overflow: hidden;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-xl */
+    height: 24rem; /* Fix for absolute positioned images */
+    transition: box-shadow 0.3s ease; /* Added for subtle effect */
+}
+.slider-container:hover {
+    box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1); /* Slightly deeper shadow on hover */
+}
+.slider-image {
+    width: 100%;
+    height: 100%; /* Take full height of parent */
+    object-fit: cover;
+    object-position: center;
+    transition: opacity 0.7s ease-in-out;
+    position: absolute; /* Stack images for transition */
+    top: 0;
+    left: 0;
+}
+.slider-image.active-slide {
+    opacity: 1;
+    z-index: 1; /* Bring active slide to front */
+}
+.slider-image.hidden-slide {
+    opacity: 0;
+    z-index: 0;
+}
+.slider-dots {
+    position: absolute;
+    bottom: 1rem; /* bottom-4 */
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem; /* space-x-2 */
+    z-index: 2; /* Ensure dots are above images */
+}
+.dot {
+    width: 0.75rem; /* w-3 */
+    height: 0.75rem; /* h-3 */
+    border-radius: 9999px; /* rounded-full */
+    background-color: #d1d5db; /* gray-300 */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Added transform for hover */
+    cursor: pointer;
+    border: none;
+    padding: 0;
+}
+.dot:hover {
+    background-color: #9ca3af; /* gray-400 */
+    transform: scale(1.2); /* Dots pop on hover */
+}
+.dot.active-dot {
+    background-color: #db2777; /* pink-700 */
+    transform: scale(1.1); /* Active dot slightly larger */
+}
+
+/* --- Category Cards (Men/Women) --- */
+.category-card {
+    background-color: #fafafa; /* neutral-50 */
+    padding: 1.5rem; /* p-6 */
+    border-radius: 0.75rem; /* rounded-xl */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-lg */
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Added box-shadow transition */
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+.category-card:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05),
+                0 0 20px rgba(219, 39, 119, 0.3); /* Enhanced shadow with strong glow */
+    transform: translateY(-0.75rem); /* Increased lift on hover */
+}
+.category-card-image {
+    width: 100%;
+    height: 16rem; /* h-64 */
+    object-fit: cover;
+    object-position: center;
+    transition: transform 0.4s ease; /* Made transition slightly slower */
+}
+.category-card:hover .category-card-image {
+    transform: scale(1.08); /* Increased image scale on hover */
+}
+.category-card-content {
+    padding-top: 1.5rem; /* p-6 */
+    text-align: center;
+}
+.card-subtitle {
+    color: #db2777; /* pink-700 */
+    font-weight: 500; /* font-medium */
+}
+
+.category-card.alt-card { /* Specifically for women's cards if they need a different background */
+    background-color: #fff; /* bg-white */
+}
+
+/* --- How It Works Section --- */
+.how-it-works-step-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem; /* p-6 */
+    background-color: #fafafa; /* neutral-50 */
+    border-radius: 0.75rem; /* rounded-xl */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-lg */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Added box-shadow transition */
+}
+.how-it-works-step-card:hover {
+    transform: translateY(-0.5rem); /* Lift on hover */
+    box-shadow: 0 8px 10px -1px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05),
+                0 0 15px rgba(219, 39, 119, 0.25); /* Enhanced shadow with glow */
+}
+.how-it-works-icon-wrapper {
+    background-color: #fce7f3; /* pink-100 */
+    color: #be185d; /* pink-700 */
+    padding: 1rem; /* p-4 */
+    border-radius: 9999px; /* rounded-full */
+    margin-bottom: 1rem; /* mb-4 */
+    transition: transform 0.3s ease; /* Added for icon hover */
+}
+.how-it-works-step-card:hover .how-it-works-icon-wrapper {
+    transform: rotate(10deg) scale(1.1); /* Icon slightly rotates and scales on card hover */
+}
+.how-it-works-icon {
+    width: 2.25rem; /* size={36} */
+    height: 2.25rem; /* size={36} */
+}
+.step-description {
+    color: #4b5563; /* gray-600 */
+    text-align: center;
+}
+
+/* --- Style Advisor Section --- */
+.max-width-3xl {
+    max-width: 48rem; /* max-w-3xl */
+}
+.style-advisor-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem; /* space-y-4 */
+}
+.style-advisor-textarea {
+    width: 100%;
+    padding: 1rem; /* p-4 */
+    border-radius: 0.5rem; /* rounded-lg */
+    border: 2px solid #d1d5db; /* border-2 border-gray-300 */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Enhanced transition */
+    color: #171717; /* gray-900 */
+    resize: vertical; /* resize-y */
+    min-height: 100px;
+}
+.style-advisor-textarea:focus {
+    border-color: #ec4899; /* pink-500 */
+    box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.4); /* Stronger focus ring */
+    outline: none;
+}
+.btn-lg {
+    padding: 0.75rem 2rem; /* px-8 py-3 */
+}
+.style-advisor-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.style-advisor-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@keyframes spinner {
+    to {transform: rotate(360deg);}
+}
+.spinner-icon {
+    animation: spinner 1s linear infinite;
+    -webkit-animation: spinner 1s linear infinite;
+    -moz-animation: spinner 1s linear infinite;
+    -ms-animation: spinner 1s linear infinite;
+    -o-animation: spinner 1s linear infinite;
+    width: 1.25rem; /* h-5 */
+    height: 1.25rem; /* w-5 */
+    margin-right: 0.75rem; /* mr-3 */
+    margin-left: -0.25rem; /* -ml-1 */
+    color: #fff;
+}
+.spinner-path-1 { opacity: 0.25; }
+.spinner-path-2 { opacity: 0.75; }
+
+.error-message {
+    color: #dc2626; /* red-600 */
+    font-size: 0.875rem; /* text-sm */
+    margin-top: 0.5rem; /* mt-2 */
+}
+
+/* New animation for style advice output */
+@keyframes fadeInSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.style-advice-output {
+    background-color: #fff; /* bg-white */
+    padding: 1.5rem; /* p-6 */
+    border-radius: 0.75rem; /* rounded-xl */
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06); /* shadow-inner */
+    text-align: left;
+    width: 100%;
+    margin-top: 1.5rem; /* mt-6 */
+    border: 1px solid #fbcfe8; /* border border-pink-200 */
+    animation: fadeInSlideIn 0.6s ease-out forwards; /* Apply animation on render */
+}
+.output-title {
+    font-size: 1.25rem; /* text-xl */
+    font-weight: 600; /* font-semibold */
+    color: #171717; /* gray-900 */
+    margin-bottom: 0.75rem; /* mb-3 */
+}
+.output-text {
+    color: #374151; /* gray-700 */
+    white-space: pre-wrap; /* whitespace-pre-wrap */
+}
+
+/* --- Testimonials Section --- */
+.testimonial-card {
+    background-color: #fdf2f8; /* pink-50 */
+    padding: 2rem; /* p-8 */
+    border-radius: 0.75rem; /* rounded-xl */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+    text-align: left;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Added box-shadow transition */
+}
+.testimonial-card:hover {
+    transform: translateY(-0.5rem); /* Lift on hover */
+    box-shadow: 0 8px 10px -1px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05),
+                0 0 15px rgba(219, 39, 119, 0.2); /* Enhanced shadow with glow */
+}
+.testimonial-quote {
+    font-size: 1.125rem; /* text-lg */
+    font-style: italic;
+    color: #374151; /* gray-700 */
+    margin-bottom: 1rem; /* mb-4 */
+}
+.testimonial-author {
+    font-weight: 600; /* font-semibold */
+    color: #be185d; /* pink-700 */
+}
+.testimonial-city {
+    font-size: 0.875rem; /* text-sm */
+    color: #4b5563; /* gray-600 */
+}
+
+/* --- Footer --- */
+.footer {
+    background-color: #1f2937; /* gray-800 */
+    color: #d1d5db; /* gray-300 */
+    padding-top: 3rem; /* py-12 */
+    margin-top: 2rem; /* mt-8 */
+}
+.footer-container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    margin-left: auto;
+    margin-right: auto;
+    display: grid;
+    grid-template-columns: 1fr; /* Default to single column */
+    gap: 2rem; /* gap-8 */
+}
+.footer-heading {
+    font-size: 1.25rem; /* text-xl */
+    font-weight: 700; /* font-bold */
+    color: #fff;
+    margin-bottom: 1rem; /* mb-4 */
+}
+.footer-text {
+    font-size: 0.875rem; /* text-sm */
+}
+.social-links {
+    display: flex;
+    gap: 1rem; /* space-x-4 */
+    margin-top: 1.5rem; /* mt-6 */
+}
+.social-icon {
+    color: #9ca3af; /* gray-400 */
+    transition: color 0.3s ease;
+}
+.social-icon:hover {
+    color: #f472b6; /* pink-400 */
+}
+.footer-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    gap: 0.5rem; /* space-y-2 */
+    display: flex; /* make it flex column for gap */
+    flex-direction: column;
+}
+.footer-link {
+    color: #d1d5db; /* gray-300 */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+.footer-link:hover {
+    color: #f472b6; /* pink-400 */
+}
+.contact-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem; /* text-sm */
+}
+.contact-item .icon-mr {
+    margin-right: 0.5rem; /* mr-2 */
+}
+.contact-item.align-start {
+    align-items: flex-start;
+}
+.contact-item.align-start .icon-mr {
+    margin-top: 0.25rem; /* mt-1 */
+}
+address.address-text {
+    font-style: normal; /* not-italic */
+}
+.copyright {
+    text-align: center;
+    color: #6b7280; /* gray-500 */
+    font-size: 0.875rem; /* text-sm */
+    margin-top: 2.5rem; /* mt-10 */
+}
+
+/* --- Media Queries for Responsiveness --- */
+
+/* Medium devices (md: screens) - approx 768px */
+@media (min-width: 768px) {
+    .desktop-nav {
+        display: flex; /* md:flex */
+    }
+    .mobile-menu-button {
+        display: none; /* md:hidden */
+    }
+    .mobile-nav {
+        display: none; /* md:hidden */
+    }
+
+    .section {
+        padding-top: 6rem; /* md:py-24 */
+        padding-bottom: 6rem; /* md:py-24 */
+        margin-left: 2rem; /* md:mx-8 */
+        margin-right: 2rem; /* md:mx-8 */
+    }
+    .section-title {
+        font-size: 2.5rem; /* md:text-4xl */
+    }
+
+    .grid-3-col {
+        grid-template-columns: repeat(3, 1fr); /* md:grid-cols-3 */
+    }
+
+    .footer-container {
+        grid-template-columns: repeat(3, 1fr); /* md:grid-cols-3 */
+    }
+}
+
+/* Large devices (lg: screens) - approx 1024px */
+@media (min-width: 1024px) {
+    .grid-4-col {
+        grid-template-columns: repeat(4, 1fr); /* lg:grid-cols-4 */
+    }
+    .grid-5-col {
+        grid-template-columns: repeat(5, 1fr); /* lg:grid-cols-5 */
+    }
+}
