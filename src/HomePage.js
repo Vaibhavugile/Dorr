@@ -1,5 +1,5 @@
-// HomePage.js (Updated with Firebase Integration)
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom'; // Import the Link component
 import './HomePage.css';
 import useScrollReveal from './hooks/useScrollReveal'; // Import the custom hook
 
@@ -128,9 +128,8 @@ function HomePage() {
       chatHistory.push({ role: "user", parts: [{ text: prompt }] });
 
       const payload = { contents: chatHistory };
-      // REPLACE WITH YOUR ACTUAL GEMINI API KEY HERE
-      // You should store API keys securely, e.g., using environment variables in a real application.
-      const apiKey = "YOUR_GEMINI_API_KEY_HERE";
+      // API key is handled by the Canvas environment for gemini-2.0-flash
+      const apiKey = "";
       const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
       const response = await fetch(apiUrl, {
@@ -302,7 +301,8 @@ function HomePage() {
           ) : (
             <div className="grid-4-col gap-8">
               {menCategories.map((category) => (
-                <div key={category.id} className="category-card animate-pop-in">
+                // Changed div to Link component for navigation
+                <Link to={`/collection/men/${category.name}`} key={category.id} className="category-card animate-pop-in">
                   <img
                     src={category.image}
                     alt={category.name}
@@ -313,7 +313,7 @@ function HomePage() {
                     <h3 className="card-title">{category.name}</h3>
                     <p className="card-subtitle">Explore Styles</p>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}
@@ -334,7 +334,8 @@ function HomePage() {
           ) : (
             <div className="grid-5-col gap-8">
               {womenCategories.map((category) => (
-                <div key={category.id} className="category-card alt-card animate-pop-in">
+                // Changed div to Link component for navigation
+                <Link to={`/collection/women/${category.name}`} key={category.id} className="category-card alt-card animate-pop-in">
                   <img
                     src={category.image}
                     alt={category.name}
@@ -345,7 +346,7 @@ function HomePage() {
                     <h3 className="card-title">{category.name}</h3>
                     <p className="card-subtitle">Discover More</p>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}

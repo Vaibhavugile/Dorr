@@ -1,113 +1,196 @@
-/* src/AdminPage.css */
+/* AdminPage.css */
 
 .admin-page-container {
-    max-width: 800px;
-    margin: 40px auto;
+    max-width: 900px;
+    margin: 80px auto 40px auto; /* Add margin-top for header clearance */
     padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #333;
+    font-family: 'Inter', sans-serif;
+    background-color: #f4f7f6;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 .admin-page-container h1 {
     text-align: center;
     color: #2c3e50;
-    margin-bottom: 30px;
-    font-size: 2.5em;
+    margin-bottom: 40px;
+    font-size: 2.8rem;
     font-weight: 700;
+    letter-spacing: 1px;
 }
 
 .admin-section {
     background-color: #ffffff;
-    padding: 25px;
-    border-radius: 8px;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     margin-bottom: 30px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e0e0e0;
 }
 
 .admin-section h2 {
     color: #34495e;
-    font-size: 1.8em;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #e0e0e0;
-    padding-bottom: 10px;
+    margin-bottom: 25px;
+    font-size: 2rem;
+    font-weight: 600;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 15px;
 }
 
 .admin-form .form-group {
-    margin-bottom: 18px;
+    margin-bottom: 20px;
 }
 
 .admin-form label {
     display: block;
     margin-bottom: 8px;
-    font-weight: 600;
     color: #555;
+    font-weight: 500;
+    font-size: 1rem;
 }
 
 .admin-form input[type="text"],
 .admin-form input[type="url"],
-.admin-form input[type="number"] {
-    width: calc(100% - 20px); /* Adjust for padding */
-    padding: 12px 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 1em;
-    box-sizing: border-box; /* Include padding in element's total width and height */
-    transition: border-color 0.3s ease;
+.admin-form input[type="number"],
+.admin-form textarea,
+.admin-form select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #333;
+    background-color: #fdfdfd;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .admin-form input[type="text"]:focus,
 .admin-form input[type="url"]:focus,
-.admin-form input[type="number"]:focus {
-    border-color: #007bff; /* Highlight on focus */
+.admin-form input[type="number"]:focus,
+.admin-form textarea:focus,
+.admin-form select:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
 }
 
-.admin-form button {
+.admin-form textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.admin-btn {
     display: block;
     width: 100%;
-    padding: 12px 20px;
-    background-color: #28a745; /* Green for success */
+    padding: 15px 25px;
+    background-color: #007bff;
     color: white;
     border: none;
-    border-radius: 5px;
-    font-size: 1.1em;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
     margin-top: 20px;
 }
 
-.admin-form button:hover:not(:disabled) {
-    background-color: #218838;
+.admin-btn:hover:not(:disabled) {
+    background-color: #0056b3;
     transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
 }
 
-.admin-form button:disabled {
+.admin-btn:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+}
+
+.admin-btn:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
+    box-shadow: none;
 }
 
 .success-message {
-    color: #28a745; /* Green */
+    color: #28a744;
     background-color: #d4edda;
     border: 1px solid #c3e6cb;
-    padding: 10px;
-    border-radius: 5px;
+    padding: 10px 15px;
+    border-radius: 8px;
     margin-top: 15px;
+    font-size: 0.95rem;
     text-align: center;
-    font-weight: 500;
 }
 
 .error-message {
-    color: #dc3545; /* Red */
+    color: #dc3545;
     background-color: #f8d7da;
     border: 1px solid #f5c6cb;
-    padding: 10px;
-    border-radius: 5px;
+    padding: 10px 15px;
+    border-radius: 8px;
     margin-top: 15px;
+    font-size: 0.95rem;
     text-align: center;
-    font-weight: 500;
+}
+
+/* Specific styling for product section */
+.product-section {
+    border-left: 5px solid #28a745; /* Highlight product section */
+}
+
+.admin-select {
+    appearance: none; /* Remove default arrow */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666' width='18px' height='18px'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 18px;
+    cursor: pointer;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .admin-page-container {
+        margin: 60px 15px 30px 15px;
+        padding: 15px;
+    }
+
+    .admin-page-container h1 {
+        font-size: 2.2rem;
+        margin-bottom: 30px;
+    }
+
+    .admin-section {
+        padding: 20px;
+    }
+
+    .admin-section h2 {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+    }
+
+    .admin-form input,
+    .admin-form textarea,
+    .admin-form select,
+    .admin-btn {
+        padding: 10px 12px;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-page-container {
+        margin: 50px 10px 20px 10px;
+    }
+
+    .admin-page-container h1 {
+        font-size: 1.8rem;
+    }
+
+    .admin-section h2 {
+        font-size: 1.5rem;
+    }
+
+    .admin-form label {
+        font-size: 0.9rem;
+    }
 }
