@@ -16,7 +16,9 @@ function HomePage() {
   const [womenCategories, setWomenCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [categoryError, setCategoryError] = useState('');
-
+ const [allProducts, setAllProducts] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
+  const [productFetchError, setProductFetchError] = useState('');
   // Data for Testimonials (can also be fetched from Firebase)
   const testimonials = [
     {
@@ -129,7 +131,7 @@ function HomePage() {
 
       const payload = { contents: chatHistory };
       // API key is handled by the Canvas environment for gemini-2.0-flash
-      const apiKey = "";
+      const apiKey = "AIzaSyB8Qs1DCfin_qFAoo19CDAe8I3qnkmaj0U";
       const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
       const response = await fetch(apiUrl, {

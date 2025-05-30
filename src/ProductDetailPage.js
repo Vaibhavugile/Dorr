@@ -1,36 +1,50 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react'; // Import useRef
 import { useParams, Link } from 'react-router-dom';
-import './ProductDetailPage.css'; // We'll create this CSS file
+import './ProductDetailPage.css';
 import { db } from './firebaseConfig';
-import { doc, getDoc, collection, query, where, getDocs, addDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs,limit } from 'firebase/firestore';
 
 // Import icons from lucide-react
-import { IndianRupee, ShoppingCart, Info, CheckCircle, XCircle, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { IndianRupee, MessageSquare, Info, CheckCircle, XCircle, Loader2, ChevronLeft, ChevronRight, Ruler, Palette, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react'; // Added ZoomIn, ZoomOut, Maximize2
 
 function ProductDetailPage() {
-    const { gender, subcategoryName, productId } = useParams(); // Get params from URL
+    const { gender, subcategoryName, productId } = useParams();
 
     const [product, setProduct] = useState(null);
     const [loadingProduct, setLoadingProduct] = useState(true);
     const [productError, setProductError] = useState('');
 
-    // Product selection states
-    const [selectedSize, setSelectedSize] = useState(''); // User selected size for rental
-    const [selectedColor, setSelectedColor] = useState(''); // User selected color for rental (if product has multiple)
+    const [selectedSize, setSelectedSize] = useState('');
+    const [selectedColor, setSelectedColor] = useState('');
 
-    // Image carousel state
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [displayImages, setDisplayImages] = useState([]); // State for combined images
 
-    const [showModal, setShowModal] = useState(false);
+    const [showModal, setShowModal] = useState(false); // For inquiry/error modal
     const [modalMessage, setModalMessage] = useState('');
-    const [modalType, setModalType] = useState(''); // 'success' or 'error'
+    const [modalType, setModalType] = useState('');
 
-    // --- Firebase Data Fetching for Single Product ---
+    // --- New States for Zoom Modal ---
+    const [showZoomModal, setShowZoomModal] = useState(false);
+    const [zoomImageUrl, setZoomImageUrl] = useState('');
+    const [zoomLevel, setZoomLevel] = useState(1); // 1 = 100% zoom
+    const imageRef = useRef(null); // Ref for the image in the zoom modal for pan
+    const [isPanning, setIsPanning] = useState(false);
+    const [startPan, setStartPan] = useState({ x: 0, y: 0 });
+    const [imageOffset, setImageOffset] = useState({ x: 0, y: 0 });
+
+    // --- New State for Related Products ---
+    const [relatedProducts, setRelatedProducts] = useState([]);
+    const [loadingRelatedProducts, setLoadingRelatedProducts] = useState(false);
+    const [relatedProductsError, setRelatedProductsError] = useState('');
+
     useEffect(() => {
         const fetchProduct = async () => {
             setLoadingProduct(true);
             setProductError('');
-            setProduct(null); // Clear previous product
+            setProduct(null);
+            setDisplayImages([]);
+            setRelatedProducts([]); // Clear related products on new product fetch
 
             if (!productId || !gender || !subcategoryName) {
                 setProductError("Missing product ID, gender, or subcategory name in URL.");
@@ -39,10 +53,9 @@ function ProductDetailPage() {
             }
 
             try {
-                // Determine the correct parent collection based on gender
                 const parentCollection = gender === 'men' ? 'menCategories' : 'womenCategories';
+                let currentSubcategoryDocId = ''; // To store the subcategory document ID
 
-                // Step 1: Find the subcategory document ID by its name
                 const subcategoryQuery = query(
                     collection(db, parentCollection),
                     where('name', '==', subcategoryName)
@@ -56,10 +69,9 @@ function ProductDetailPage() {
                 }
 
                 const subcategoryDoc = subcategorySnapshot.docs[0];
-                const subcategoryDocId = subcategoryDoc.id; // This is the actual document ID!
+                currentSubcategoryDocId = subcategoryDoc.id; // Store for related products fetch
 
-                // Step 2: Fetch the product from the 'products' subcollection using the actual subcategoryDocId
-                const productDocRef = doc(db, parentCollection, subcategoryDocId, 'products', productId);
+                const productDocRef = doc(db, parentCollection, currentSubcategoryDocId, 'products', productId);
                 const productDocSnap = await getDoc(productDocRef);
 
                 if (!productDocSnap.exists()) {
@@ -71,19 +83,72 @@ function ProductDetailPage() {
                 const productData = productDocSnap.data();
                 setProduct({ id: productDocSnap.id, ...productData });
 
-                // Set initial selected size/color if available
+                const combinedProductImages = [];
+                const uniqueImageUrls = new Set();
+
+                if (productData.imageUrl && typeof productData.imageUrl === 'string') {
+                    combinedProductImages.push(productData.imageUrl);
+                    uniqueImageUrls.add(productData.imageUrl);
+                }
+
+                if (productData.images && Array.isArray(productData.images)) {
+                    productData.images.forEach(img => {
+                        if (img && typeof img === 'string' && !uniqueImageUrls.has(img)) {
+                            combinedProductImages.push(img);
+                            uniqueImageUrls.add(img);
+                        }
+                    });
+                }
+                setDisplayImages(combinedProductImages);
+
                 if (productData.sizes && productData.sizes.length > 0) {
                     setSelectedSize(productData.sizes[0]);
                 }
-                // Prioritize 'colors' array, then 'color' string
                 if (productData.colors && productData.colors.length > 0) {
                     setSelectedColor(productData.colors[0]);
                 } else if (productData.color) {
                     setSelectedColor(productData.color);
                 }
 
-                // Reset image index when new product loads
                 setCurrentImageIndex(0);
+
+                // --- Fetch Related Products ---
+                setLoadingRelatedProducts(true);
+                setRelatedProductsError('');
+                try {
+                    let relatedProductsQuery = collection(db, parentCollection, currentSubcategoryDocId, 'products');
+                    relatedProductsQuery = query(
+                        relatedProductsQuery,
+                        where('__name__', '!=', productId) // Exclude the current product
+                    );
+
+                    // If the product has 'availableStores', filter by it
+                    if (productData.availableStores && Array.isArray(productData.availableStores) && productData.availableStores.length > 0) {
+                         // Use array-contains-any to match any of the current product's stores
+                         // Note: array-contains-any can take up to 10 values
+                         relatedProductsQuery = query(
+                            relatedProductsQuery,
+                            where('availableStores', 'array-contains-any', productData.availableStores)
+                        );
+                    }
+
+                    // Limit to a reasonable number of related products
+                    relatedProductsQuery = query(relatedProductsQuery, limit(5));
+
+
+                    const relatedProductsSnapshot = await getDocs(relatedProductsQuery);
+                    const fetchedRelatedProducts = relatedProductsSnapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data()
+                    }));
+                    setRelatedProducts(fetchedRelatedProducts);
+
+                } catch (relatedError) {
+                    console.error("Error fetching related products:", relatedError);
+                    setRelatedProductsError("Failed to load related products.");
+                } finally {
+                    setLoadingRelatedProducts(false);
+                }
 
             } catch (error) {
                 console.error("Error fetching product:", error);
@@ -94,88 +159,132 @@ function ProductDetailPage() {
         };
 
         fetchProduct();
-    }, [productId, gender, subcategoryName]); // Re-fetch if product ID or category changes
+    }, [productId, gender, subcategoryName]);
 
-    // --- Image Carousel Navigation ---
     const handleThumbnailClick = (index) => {
         setCurrentImageIndex(index);
     };
 
     const handlePrevImage = () => {
         setCurrentImageIndex((prevIndex) =>
-            prevIndex === 0 ? (product.images?.length || 1) - 1 : prevIndex - 1
+            prevIndex === 0 ? (displayImages.length || 1) - 1 : prevIndex - 1
         );
     };
 
     const handleNextImage = () => {
         setCurrentImageIndex((prevIndex) =>
-            prevIndex === (product.images?.length || 1) - 1 ? 0 : prevIndex + 1
+            prevIndex === (displayImages.length || 1) - 1 ? 0 : prevIndex + 1
         );
     };
 
-
-    // --- Add to Cart (Placeholder) ---
-    const handleAddToCart = async () => {
-        if (!product || !selectedSize || !selectedColor) {
-            setModalMessage('Please select a size and color before adding to cart.');
+    const handleEnquire = async () => {
+        if (!product || !selectedSize || (!selectedColor && (product.colors && product.colors.length > 0 && product.color === undefined))) {
+            setModalMessage('Please select a size and color before sending your inquiry.');
             setModalType('error');
             setShowModal(true);
             return;
         }
 
         try {
-            // Determine the correct parent collection based on gender for booking path
-            const parentCollection = gender === 'men' ? 'menCategories' : 'womenCategories';
-
-            // Find the subcategory document ID by its name for the booking path
-            const subcategoryQuery = query(
-                collection(db, parentCollection),
-                where('name', '==', subcategoryName)
-            );
-            const subcategorySnapshot = await getDocs(subcategoryQuery);
-            if (subcategorySnapshot.empty) {
-                setModalMessage(`Error: Could not find category for booking.`);
-                setModalType('error');
-                setShowModal(true);
-                return;
-            }
-            const subcategoryDocId = subcategorySnapshot.docs[0].id;
-
-            // Simulate adding to cart - in a real app, this would add to a user's cart collection
-            // or a temporary client-side state.
-            // For now, we'll log it and show a success message.
-            console.log("Product added to cart simulated:", {
+            console.log("Product inquiry simulated:", {
                 productId: product.id,
                 name: product.name,
                 size: selectedSize,
-                color: selectedColor,
+                color: selectedColor || 'N/A', // Use 'N/A' if no color was selected/available
                 rent: product.rent,
-                // userId: currentUser.uid (if you have auth)
             });
 
-            setModalMessage(`"${product.name}" (${selectedSize}, ${selectedColor}) has been added to your cart!`);
+            setModalMessage(`Your inquiry for "${product.name}" (${selectedSize}, ${selectedColor || 'N/A'}) has been sent! We will get back to you shortly.`);
             setModalType('success');
             setShowModal(true);
 
         } catch (error) {
-            console.error("Error adding to cart:", error);
-            setModalMessage('Failed to add to cart. Please try again.');
+            console.error("Error sending inquiry:", error);
+            setModalMessage('Failed to send inquiry. Please try again.');
             setModalType('error');
             setShowModal(true);
         }
     };
 
-    // Function to close modal
     const closeModal = () => {
         setShowModal(false);
         setModalMessage('');
         setModalType('');
     };
 
+    // --- New Zoom Modal Functions ---
+    const openZoomModal = (imageUrl) => {
+        setZoomImageUrl(imageUrl);
+        setZoomLevel(1); // Reset zoom level
+        setImageOffset({ x: 0, y: 0 }); // Reset offset
+        setShowZoomModal(true);
+        document.body.style.overflow = 'hidden'; // Prevent scrolling background
+    };
+
+    const closeZoomModal = () => {
+        setShowZoomModal(false);
+        setZoomImageUrl('');
+        setZoomLevel(1);
+        setImageOffset({ x: 0, y: 0 });
+        document.body.style.overflow = 'unset'; // Re-enable scrolling
+    };
+
+    const handleZoomIn = () => {
+        setZoomLevel((prev) => Math.min(prev + 0.2, 3)); // Max zoom 3x
+    };
+
+    const handleZoomOut = () => {
+        setZoomLevel((prev) => Math.max(prev - 0.2, 1)); // Min zoom 1x
+    };
+
+    const handleMouseDown = (e) => {
+        if (zoomLevel > 1) { // Only pan if zoomed in
+            setIsPanning(true);
+            setStartPan({ x: e.clientX - imageOffset.x, y: e.clientY - imageOffset.y });
+        }
+    };
+
+    const handleMouseMove = (e) => {
+        if (!isPanning || zoomLevel === 1) return;
+
+        const newX = e.clientX - startPan.x;
+        const newY = e.clientY - startPan.y;
+
+        // Optional: Clamp offsets to prevent panning too far
+        // This is a basic clamp, can be more sophisticated based on image dimensions
+        const img = imageRef.current;
+        if (img) {
+            const containerWidth = img.parentElement.clientWidth;
+            const containerHeight = img.parentElement.clientHeight;
+            const imgWidth = img.naturalWidth * zoomLevel;
+            const imgHeight = img.naturalHeight * zoomLevel;
+
+            // Simple clamping to keep image within container bounds
+            const maxPanX = (imgWidth - containerWidth) / 2;
+            const maxPanY = (imgHeight - containerHeight) / 2;
+
+            // Adjust newX and newY to respect boundaries if necessary
+            // This is a more complex calculation involving the image's original dimensions
+            // For now, allow free panning and rely on the user to recenter if needed.
+        }
+
+        setImageOffset({ x: newX, y: newY });
+    };
+
+    const handleMouseUp = () => {
+        setIsPanning(false);
+    };
+
+    // Reset pan and zoom on double click
+    const handleDoubleClick = () => {
+        setZoomLevel(1);
+        setImageOffset({ x: 0, y: 0 });
+    };
+
     if (loadingProduct) {
         return (
-            <div className="product-detail-page loading-state">
-                <Loader2 size={48} className="animate-spin text-blue-500" />
+            <div className="loading-spinner-container">
+                <Loader2  className="loading-spinner" />
                 <p>Loading product details...</p>
             </div>
         );
@@ -201,147 +310,193 @@ function ProductDetailPage() {
         );
     }
 
-    // Determine the image to display in the main view
-    const mainImageUrl = (product.images && product.images.length > 0)
-        ? product.images[currentImageIndex]
-        : product.imageUrl || `https://placehold.co/600x800/e0e0e0/333333?text=${product.name}`;
+    const mainImageUrl = displayImages[currentImageIndex] || `https://placehold.co/600x800/e0e0e0/333333?text=${product.name}`;
 
     return (
-        <div className="product-detail-page">
-            {/* Header for Product Detail */}
-            <header className="product-detail-header">
-                <div className="product-detail-header-content">
-                    <h1 className="product-detail-title">{product.name}</h1>
-                    <p className="product-detail-breadcrumb">
+        <div className="product-detail-page new-layout">
+            <header className="page-header-section">
+                <div className="container">
+                    <p className="breadcrumb-nav">
                         <Link to="/" className="breadcrumb-link">Home</Link>
                         <span className="breadcrumb-separator"> / </span>
                         <Link to={`/collection/${gender}`} className="breadcrumb-link">{gender === 'men' ? 'Men' : 'Women'}</Link>
                         <span className="breadcrumb-separator"> / </span>
                         <Link to={`/collection/${gender}/${subcategoryName}`} className="breadcrumb-link">{subcategoryName}</Link>
-                        <span className="breadcrumb-separator"> / </span>
-                        {product.name}
                     </p>
+                    <h1 className="product-main-title">{product.name}</h1>
                 </div>
             </header>
 
-            <div className="product-detail-content-wrapper">
-                {/* Product Image Gallery */}
-                <div className="product-image-gallery">
-                    <div className="main-image-container">
+            <section className="product-main-section container">
+                <div className="product-gallery-column">
+                    <div className="main-image-display" onClick={() => openZoomModal(mainImageUrl)}> {/* Added onClick */}
                         <img
                             src={mainImageUrl}
                             alt={product.name}
                             className="main-product-image"
-                            onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/600x800/cccccc/333333?text=${product.name}`; }}
+                            onError={(e) => {
+                                console.error(`Error loading main product image for "${product.name}". Attempted URL: ${e.target.src}`, e);
+                                e.target.onerror = null;
+                                e.target.src = `https://placehold.co/600x800/cccccc/333333?text=${product.name}`;
+                            }}
                         />
-                        {/* Navigation arrows for main image */}
-                        {(product.images && product.images.length > 1) && (
+                        {(displayImages && displayImages.length > 1) && (
                             <>
-                                <button className="nav-arrow left-arrow" onClick={handlePrevImage} aria-label="Previous image">
+                                <button className="nav-arrow left-arrow" onClick={(e) => { e.stopPropagation(); handlePrevImage(); }} aria-label="Previous image">
                                     <ChevronLeft size={30} />
                                 </button>
-                                <button className="nav-arrow right-arrow" onClick={handleNextImage} aria-label="Next image">
+                                <button className="nav-arrow right-arrow" onClick={(e) => { e.stopPropagation(); handleNextImage(); }} aria-label="Next image">
                                     <ChevronRight size={30} />
                                 </button>
                             </>
                         )}
+                        <div className="click-to-zoom-indicator">
+                            <Maximize2 size={24} /> Click to Zoom
+                        </div>
                     </div>
 
-                    {/* Thumbnail Gallery (scrollable) */}
-                    {product.images && product.images.length > 1 && (
-                        <div className="thumbnail-gallery">
-                            {product.images.map((img, index) => (
+                    {displayImages && displayImages.length > 0 && (
+                        <div className="thumbnail-strip">
+                            {displayImages.map((img, index) => (
                                 <img
                                     key={index}
                                     src={img}
                                     alt={`${product.name} thumbnail ${index + 1}`}
                                     className={`thumbnail-image ${index === currentImageIndex ? 'active-thumbnail' : ''}`}
                                     onClick={() => handleThumbnailClick(index)}
-                                    onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/80x80/cccccc/333333?text=Thumb`; }}
+                                    onError={(e) => {
+                                        console.error(`Error loading thumbnail image ${index + 1} for "${product.name}". Attempted URL: ${e.target.src}`, e);
+                                        e.target.onerror = null;
+                                        e.target.src = `https://placehold.co/80x80/cccccc/333333?text=Thumb`;
+                                    }}
                                 />
                             ))}
                         </div>
                     )}
                 </div>
 
-                {/* Product Information and Rental Options */}
-                <div className="product-info-rental">
-                    <h2 className="product-name-detail">{product.name}</h2>
-                    <p className="product-code-detail">Product Code: {product.productCode}</p>
-                    <p className="product-description">{product.description}</p>
+                <div className="product-details-column">
+                    <h2 className="product-secondary-title">{product.name}</h2>
+                    <p className="product-code-display">Product Code: **{product.productCode}**</p>
 
-                    <div className="price-info">
-                        <span className="rent-price"><IndianRupee size={24} className="inline-icon" />{product.rent.toLocaleString('en-IN')}</span> / day
+                    <div className="product-price-block">
+                        <span className="rent-price-large"><IndianRupee size={30} className="inline-icon" />{product.rent.toLocaleString('en-IN')}</span> <span className="price-term">for 3 days</span>
                         {product.originalPrice && (
-                            <span className="original-price">M.R.P: <IndianRupee size={16} className="inline-icon" />{product.originalPrice.toLocaleString('en-IN')}</span>
+                            <span className="original-price-strike">M.R.P: <IndianRupee size={20} className="inline-icon" />{product.originalPrice.toLocaleString('en-IN')}</span>
                         )}
                     </div>
 
-                    {/* Size Selection */}
-                    <div className="selection-group">
-                        <label htmlFor="size-select-detail">Select Size:</label>
-                        <select
-                            id="size-select-detail"
-                            value={selectedSize}
-                            onChange={(e) => setSelectedSize(e.target.value)}
-                            className="detail-select"
-                        >
-                            {product.sizes && product.sizes.length > 0 ? (
-                                product.sizes.map(size => (
-                                    <option key={size} value={size}>{size}</option>
-                                ))
-                            ) : (
-                                <option value="">No sizes available</option>
-                            )}
-                        </select>
-                        {/* Link to size chart could go here */}
-                        <a href="#" className="size-chart-link">Size Chart</a>
+                    <div className="product-description-block">
+                        <h3 className="section-heading">Description</h3>
+                        <p>{product.description || 'No detailed description available.'}</p>
                     </div>
 
-                    {/* Color Selection (if product has multiple colors) */}
-                    {product.colors && product.colors.length > 1 && (
-                        <div className="selection-group">
-                            <label htmlFor="color-select-detail">Select Color:</label>
+                    <div className="product-options">
+                        <div className="option-group">
+                            <label htmlFor="size-select-detail" className="option-label">
+                                <Ruler size={20} className="icon-mr" /> Available Sizes:
+                            </label>
                             <select
-                                id="color-select-detail"
-                                value={selectedColor}
-                                onChange={(e) => setSelectedColor(e.target.value)}
-                                className="detail-select"
+                                id="size-select-detail"
+                                value={selectedSize}
+                                onChange={(e) => setSelectedSize(e.target.value)}
+                                className="option-select"
                             >
-                                {product.colors.map(color => (
-                                    <option key={color} value={color}>{color}</option>
-                                ))}
+                                {product.sizes && product.sizes.length > 0 ? (
+                                    product.sizes.map(size => (
+                                        <option key={size} value={size}>{size}</option>
+                                    ))
+                                ) : (
+                                    <option value="">No sizes available</option>
+                                )}
                             </select>
+                            <a href="#" className="size-chart-link" onClick={(e) => e.preventDefault()}>Size Chart</a>
                         </div>
-                    )}
-                    {/* Display single color if not multiple */}
-                    {product.color && (!product.colors || product.colors.length <= 1) && (
-                        <p className="product-color-display">Color: {product.color}</p>
-                    )}
 
-                    {/* Action Buttons */}
-                    <div className="action-buttons">
-                        <button
-                            onClick={handleAddToCart}
-                            disabled={!product || !selectedSize || !selectedColor} // Removed date/availability checks
-                            className="btn btn-primary add-to-cart-btn"
-                        >
-                            <ShoppingCart size={20} className="icon-mr" /> Add to Cart
-                        </button>
-                        {/* Removed "Rent Now" button */}
+                        {product.colors && product.colors.length > 1 && (
+                            <div className="option-group">
+                                <label htmlFor="color-select-detail" className="option-label">
+                                    <Palette size={20} className="icon-mr" /> Available Colors:
+                                </label>
+                                <select
+                                    id="color-select-detail"
+                                    value={selectedColor}
+                                    onChange={(e) => setSelectedColor(e.target.value)}
+                                    className="option-select"
+                                >
+                                    {product.colors.map(color => (
+                                        <option key={color} value={color}>{color}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+                        {product.color && (!product.colors || product.colors.length <= 1) && (
+                             <p className="product-color-display option-group">
+                                <Palette size={20} className="icon-mr" />Available Color: <strong>{product.color}</strong>
+                            </p>
+                        )}
                     </div>
 
-                    {/* Additional Product Details */}
-                    <div className="additional-details">
-                        <h3 className="details-heading">More Details:</h3>
-                        <p><strong>Material:</strong> {product.material || 'Not specified'}</p>
-                        <p><strong>Care:</strong> {product.careInstructions || 'Dry clean only'}</p>
-                        <p><strong>Available at:</strong> {product.availableStores ? product.availableStores.join(', ') : 'Check in-store'}</p>
+                    <div className="action-area">
+                        <button
+                            onClick={handleEnquire}
+                            disabled={!product || !selectedSize || (!selectedColor && (product.colors && product.colors.length > 0 && product.color === undefined))}
+                            className="btn btn-primary enquire-button"
+                        >
+                            <MessageSquare size={20} className="icon-mr" /> Enquire Now
+                        </button>
+                    </div>
+
+                    <div className="additional-info-block">
+                        <h3 className="section-heading">Product Specifications:</h3>
+                        <ul>
+                            <li><strong>Material:</strong> {product.material || 'Not specified'}</li>
+                            <li><strong>Care Instructions:</strong> {product.careInstructions || 'Dry clean only'}</li>
+                            <li><strong>Available at:</strong> {product.availableStores ? product.availableStores.join(', ') : 'Check in-store'}</li>
+                        </ul>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            {/* Modal for messages */}
+            {/* --- Related Products Section --- */}
+            {loadingRelatedProducts && (
+                <div className="loading-spinner-container">
+                    <Loader2 className="loading-spinner" />
+                    <p>Loading similar products...</p>
+                </div>
+            )}
+            {relatedProductsError && (
+                <div className="error-message">
+                    <p>{relatedProductsError}</p>
+                </div>
+            )}
+            {!loadingRelatedProducts && relatedProducts.length > 0 && (
+                <section className="related-products-section container">
+                    <h2 className="section-heading">Explore More Styles</h2>
+                    <div className="related-products-grid">
+                        {relatedProducts.map((p) => (
+                            <Link to={`/product/${gender}/${subcategoryName}/${p.id}`} key={p.id} className="related-product-card">
+                                <img
+                                    src={p.imageUrl || `https://placehold.co/300x400/e0e0e0/333333?text=${p.name}`}
+                                    alt={p.name}
+                                    className="related-product-image"
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src = `https://placehold.co/300x400/cccccc/333333?text=${p.name}`;
+                                    }}
+                                />
+                                <h3 className="related-product-name">{p.name}</h3>
+                                <p className="related-product-price">
+                                    <IndianRupee size={16} className="inline-icon" />{p.rent.toLocaleString('en-IN')}
+                                </p>
+                            </Link>
+                        ))}
+                    </div>
+                </section>
+            )}
+
+
+            {/* Inquiry/Error Modal */}
             {showModal && (
                 <div className="modal-overlay">
                     <div className={`modal-content ${modalType}`}>
@@ -349,6 +504,44 @@ function ProductDetailPage() {
                         {modalType === 'success' ? <CheckCircle size={48} className="modal-icon success-icon" /> : <XCircle size={48} className="modal-icon error-icon" />}
                         <p className="modal-message">{modalMessage}</p>
                         <button onClick={closeModal} className="btn btn-primary modal-ok-button">OK</button>
+                    </div>
+                </div>
+            )}
+
+            {/* --- New Zoom Image Modal --- */}
+            {showZoomModal && (
+                <div className="zoom-modal-overlay" onClick={closeZoomModal}>
+                    <div className="zoom-modal-content" onClick={(e) => e.stopPropagation()}> {/* Prevent closing when clicking image */}
+                        <button className="zoom-close-button" onClick={closeZoomModal}>&times;</button>
+
+                        <div
+                            className="zoomed-image-wrapper"
+                            onMouseDown={handleMouseDown}
+                            onMouseMove={handleMouseMove}
+                            onMouseUp={handleMouseUp}
+                            onMouseLeave={handleMouseUp} // Stop panning if mouse leaves
+                            onDoubleClick={handleDoubleClick} // Reset on double click
+                            style={{ cursor: zoomLevel > 1 ? (isPanning ? 'grabbing' : 'grab') : 'zoom-in' }}
+                        >
+                            <img
+                                ref={imageRef}
+                                src={zoomImageUrl}
+                                alt="Zoomed Product"
+                                className="zoomed-image"
+                                style={{
+                                    transform: `scale(${zoomLevel}) translate(${imageOffset.x / zoomLevel}px, ${imageOffset.y / zoomLevel}px)`,
+                                    transformOrigin: 'center center', // Keep origin centered for simple pan
+                                    transition: isPanning ? 'none' : 'transform 0.1s ease-out' // Smooth zoom, no pan transition
+                                }}
+                            />
+                        </div>
+
+                        <div className="zoom-controls">
+                            <button className="zoom-button" onClick={handleZoomOut} disabled={zoomLevel <= 1}><ZoomOut size={24} /></button>
+                            <span className="zoom-level-text">{(zoomLevel * 100).toFixed(0)}%</span>
+                            <button className="zoom-button" onClick={handleZoomIn} disabled={zoomLevel >= 3}><ZoomIn size={24} /></button>
+                            <button className="zoom-button reset-zoom-button" onClick={handleDoubleClick} title="Reset Zoom">Reset</button>
+                        </div>
                     </div>
                 </div>
             )}
