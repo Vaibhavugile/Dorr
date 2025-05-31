@@ -1108,7 +1108,180 @@ address.address-text {
     color: #be185d; /* darker pink text */
     transform: translateY(-2px);
 }
+/* --- Hero Section Styles --- */
+/* --- Hero Section Alternative Styles --- */
+/* --- Hero Section - Ultimate Design with Background Image Styles --- */
+.hero-section-ultimate {
+    position: relative;
+    width: 100%;
+    min-height: 95vh; /* Make it almost full viewport height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    color: #ffffff; /* Default text color for contrast */
+}
 
+.hero-ultimate-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        linear-gradient(to right, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2)), /* Darker gradient overlay from left */
+        url('C:/Users/vaibh/dor/src/assets/weddigng.jpg') center center / cover no-repeat;
+    /* IMPORTANT: Replace the URL above with your high-resolution hero image! */
+    z-index: 1; /* Behind content */
+    transform: scale(1.05); /* Slightly scale up for a subtle zoom effect */
+    animation: background-pan-zoom 60s linear infinite alternate; /* Slow pan/zoom effect */
+}
+
+@keyframes background-pan-zoom {
+    0% {
+        transform: scale(1.05) translate(0, 0);
+    }
+    100% {
+        transform: scale(1.15) translate(5%, 5%);
+    }
+}
+
+
+.hero-ultimate-content {
+    position: relative;
+    z-index: 2; /* Above background */
+    max-width: 60rem; /* max-w-6xl */
+    text-align: center;
+    padding-left: 1.5rem; /* px-6 */
+    padding-right: 1.5rem; /* px-6 */
+    color: #ffffff; /* Ensure text is white against the dark overlay */
+}
+
+.hero-ultimate-title {
+    font-size: 5.5rem; /* Even larger, text-9xl */
+    font-weight: 900; /* font-black */
+    line-height: 1;
+    letter-spacing: -0.07em; /* tracking-tighter */
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 6px 15px rgba(0, 0, 0, 0.4); /* Stronger shadow for readability */
+}
+
+.hero-ultimate-description {
+    font-size: 1.625rem; /* text-3xl */
+    font-weight: 400; /* Regular weight */
+    color: #e2e8f0; /* gray-200 */
+    margin-bottom: 3rem;
+    line-height: 1.5;
+    max-width: 50rem;
+    margin-left: auto;
+    margin-right: auto;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.hero-ultimate-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 2rem; /* space-x-8 */
+    flex-wrap: wrap;
+}
+
+.hero-ultimate-button-women,
+.hero-ultimate-button-men {
+    padding: 1.25rem 3rem; /* py-5 px-12 */
+    border-radius: 0.5rem; /* rounded-lg */
+    font-weight: 700; /* font-bold */
+    text-decoration: none;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    cursor: pointer;
+    border: none;
+    font-size: 1.25rem; /* text-xl */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); /* Soft shadow */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-ultimate-button-women {
+    background-color: #ec4899; /* pink-500 */
+    color: #fff;
+}
+
+.hero-ultimate-button-women:hover {
+    background-color: #db2777; /* pink-600 */
+    transform: translateY(-5px) scale(1.03);
+    box-shadow: 0 10px 30px rgba(236, 72, 153, 0.5);
+}
+
+.hero-ultimate-button-men {
+    background-color: transparent;
+    color: #ffffff;
+    border: 2px solid #ffffff; /* White border */
+}
+
+.hero-ultimate-button-men:hover {
+    background-color: rgba(255, 255, 255, 0.15); /* Slight white fill on hover */
+    color: #ffffff;
+    transform: translateY(-5px) scale(1.03);
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
+}
+
+.hero-ultimate-button-women .icon-right,
+.hero-ultimate-button-men .icon-right {
+    margin-left: 0.75rem;
+}
+
+/* Responsive adjustments for Ultimate Hero Section */
+@media (max-width: 1024px) {
+    .hero-ultimate-title {
+        font-size: 4.5rem; /* text-8xl */
+    }
+    .hero-ultimate-description {
+        font-size: 1.375rem; /* text-2xl */
+    }
+    .hero-section-ultimate {
+        min-height: 80vh;
+        padding-top: 6rem;
+        padding-bottom: 6rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-ultimate-title {
+        font-size: 3rem; /* text-5xl */
+    }
+    .hero-ultimate-description {
+        font-size: 1.125rem; /* text-lg */
+        margin-bottom: 2rem;
+    }
+    .hero-ultimate-buttons {
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+    .hero-ultimate-button-women,
+    .hero-ultimate-button-men {
+        width: 85%;
+        max-width: 320px;
+        padding: 1rem 2rem;
+        font-size: 1.125rem;
+    }
+    .hero-section-ultimate {
+        min-height: auto;
+        padding-top: 4rem;
+        padding-bottom: 4rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-ultimate-title {
+        font-size: 2.25rem; /* text-4xl */
+        letter-spacing: -0.05em;
+    }
+    .hero-ultimate-description {
+        font-size: 0.95rem; /* slightly smaller for small screens */
+    }
+}
 /* Media query for larger screens to arrange buttons side-by-side */
 @media (min-width: 640px) { /* sm breakpoint or similar */
     .modal-store-options {
