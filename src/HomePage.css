@@ -620,12 +620,7 @@
     color: #171717; /* gray-900 */
     margin-bottom: 0.75rem; /* mb-3 */
 }
-.output-text {
-    color: #374151; /* gray-700 */
-    white-space: pre-wrap; /* whitespace-pre-wrap */
-}
-
-/* --- Testimonials Section --- */
+/* Testimonials Section */
 .testimonial-card {
     background-color: #fdf2f8; /* pink-50 */
     padding: 2rem; /* p-8 */
@@ -645,6 +640,12 @@
     color: #374151; /* gray-700 */
     margin-bottom: 1rem; /* mb-4 */
 }
+.testimonial-rating { /* New class for star ratings */
+    margin-bottom: 0.5rem; /* Space below stars */
+    display: flex; /* To align stars horizontally */
+    justify-content: center; /* Center stars if needed */
+    gap: 0.2rem; /* Small gap between stars */
+}
 .testimonial-author {
     font-weight: 600; /* font-semibold */
     color: #be185d; /* pink-700 */
@@ -653,6 +654,26 @@
     font-size: 0.875rem; /* text-sm */
     color: #4b5563; /* gray-600 */
 }
+
+/* Styles for the "Read More Reviews on Google" button */
+.btn-primary { /* Reusing existing button styles but adjusting if needed */
+    display: inline-flex;
+    align-items: center;
+    background-color: #db2777; /* pink-700 */
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+}
+.btn-primary:hover {
+    background-color: #be185d; /* pink-800 */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
 
 /* --- Footer --- */
 .footer {

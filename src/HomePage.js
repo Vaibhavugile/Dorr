@@ -5,7 +5,7 @@ import './HomePage.css';
 import useScrollReveal from './hooks/useScrollReveal';
 
 // Import icons from lucide-react
-import { ChevronRight, Sparkles, Shirt, Crown, User, Mail, Phone, MapPin, Instagram, Facebook, Twitter, Clock, Wand2, Loader2 } from 'lucide-react'; // Added Loader2 for loading state
+import { ChevronRight, Sparkles, Shirt, Crown, User, Mail, Phone, MapPin, Instagram, Facebook, Twitter, Clock, Wand2, Loader2,Star } from 'lucide-react'; // Added Loader2 for loading state
 
 // Import Firebase
 import { db } from './firebaseConfig';
@@ -31,21 +31,37 @@ function HomePage() {
   // Data for Testimonials (can also be fetched from Firebase)
   const testimonials = [
     {
-      quote: "Renting from them was a breeze! The suit was perfect for my event, and the quality was exceptional.",
+      quote: "Renting from them was a breeze! The suit was perfect for my event, and the quality was exceptional. Highly recommend for any occasion!",
       author: "Rahul Sharma",
-      city: "Camp, Pune"
+      city: "Camp, Pune",
+      rating: 5 // Add a rating
     },
     {
-      quote: "My pre-wedding gown was stunning and fit perfectly. Saved me so much money, and the process was seamless.",
+      quote: "My pre-wedding gown was stunning and fit perfectly. Saved me so much money, and the process was seamless. Will definitely use again!",
       author: "Priya Singh",
-      city: "Wakad, Pune"
+      city: "Wakad, Pune",
+      rating: 5
     },
     {
-      quote: "Excellent collection and very professional service. Found the ideal sherwani for my brother's wedding.",
+      quote: "Excellent collection and very professional service. Found the ideal sherwani for my brother's wedding. Their team was very helpful.",
       author: "Amit Kumar",
-      city: "Nagpur"
+      city: "Nagpur",
+      rating: 4
+    },
+    {
+        quote: "The dress I rented for my friend's reception was beautiful and in perfect condition. Great value for money!",
+        author: "Sneha Reddy",
+        city: "Koregaon Park, Pune",
+        rating: 5
+    },
+    {
+        quote: "Very easy process from selection to return. The outfit was exactly as described and suited my event perfectly.",
+        author: "John Doe",
+        city: "Baner, Pune",
+        rating: 4
     }
   ];
+
 
   // State for the image slider
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -510,17 +526,40 @@ function HomePage() {
       </section>
 
       {/* Testimonials Section */}
-      <section ref={testimonialsRef} className={`section bg-white ${testimonialsIsVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'}`}>
+       <section ref={testimonialsRef} className={`section bg-white ${testimonialsIsVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'}`}>
         <div className="container text-center">
           <h2 className="section-title">What Our Customers Say</h2>
           <div className="grid-3-col gap-8">
             {testimonials.map((testimonial, index) => (
               <div key={index} className="testimonial-card animate-pop-in" style={{transitionDelay: `${index * 0.1}s`}}>
                 <p className="testimonial-quote">"{testimonial.quote}"</p>
+                {/* Display stars for rating */}
+                <div className="testimonial-rating">
+                    {[...Array(5)].map((_, i) => (
+                        <Star
+                            key={i}
+                            size={16}
+                            fill={i < testimonial.rating ? '#FFD700' : 'none'} // Gold for filled stars
+                            stroke={i < testimonial.rating ? '#FFD700' : '#d1d5db'} // Stroke color
+                            className="inline-block"
+                        />
+                    ))}
+                </div>
                 <p className="testimonial-author">{testimonial.author}</p>
                 <p className="testimonial-city">{testimonial.city}</p>
               </div>
             ))}
+          </div>
+          {/* Add a link to your Google My Business reviews */}
+          <div className="mt-8 text-center">
+            <a
+              href="https://www.google.com/maps/place/DOR+-+Dress+On+Rent/@18.510647,73.8701188,17z/data=!4m8!3m7!1s0x3bc2bf5a58dc7161:0x19aab6f082d33f00!8m2!3d18.510647!4d73.8726937!9m1!1b1!16s%2Fg%2F11f79pz3t4?entry=ttu&g_ep=EgoyMDI1MDUyOC4wIKXMDSoASAFQAw%3D%3D" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-primary animate-button-press"
+            >
+              Read More Reviews on Google <ChevronRight size={16} className="inline-block ml-1" />
+            </a>
           </div>
         </div>
       </section>
