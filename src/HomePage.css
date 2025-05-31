@@ -773,3 +773,145 @@ address.address-text {
         grid-template-columns: repeat(5, 1fr); /* lg:grid-cols-5 */
     }
 }
+
+/* Modal Overlay Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Dark semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it's on top of everything */
+    backdrop-filter: blur(5px); /* Optional: blur the background */
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Modal Content Styles */
+.modal-content {
+    background-color: #fff; /* White background for the modal */
+    padding: 2.5rem; /* Increased padding */
+    border-radius: 1rem; /* Rounded corners */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); /* Deeper shadow */
+    text-align: center;
+    max-width: 90%; /* Max width for responsiveness */
+    width: 500px; /* Specific width for larger screens */
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; /* Bouncy animation */
+}
+
+.modal-title {
+    font-size: 2rem; /* Larger title */
+    font-weight: 700;
+    color: #171717; /* gray-900 */
+    margin-bottom: 1rem;
+}
+
+.modal-description {
+    font-size: 1.125rem; /* Slightly larger description */
+    color: #4b5563; /* gray-600 */
+    margin-bottom: 2rem; /* More space below description */
+}
+
+.modal-store-options {
+    display: flex;
+    flex-direction: column; /* Stack buttons vertically on small screens */
+    gap: 1rem; /* Space between buttons */
+    margin-bottom: 1.5rem;
+}
+
+.modal-store-button {
+    width: 100%; /* Full width buttons */
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    background-color: #db2777; /* pink-700 */
+    color: #fff;
+    border: none;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    /* Added for icon background positioning */
+    position: relative; /* Establish positioning context for children */
+    overflow: hidden; /* Hide overflowing icon parts */
+    display: flex; /* Use flexbox to center content */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    min-height: 80px; /* Ensure enough height for the background icon */
+}
+
+.modal-store-button:hover {
+    background-color: #be185d; /* pink-800 */
+    transform: translateY(-2px); /* Slight lift */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Styles for the icon as background */
+/* Styles for the icon as background */
+/* Styles for the icon as background */
+.modal-button-icon-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0.4; /* Increased opacity to make the icon more visible */
+    transition: opacity 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.modal-store-button:hover .modal-button-icon-bg {
+    opacity: 0.5; /* Slightly more visible on hover */
+}
+
+.modal-button-icon {
+    color: #fce7f3; /* Changed icon color to light pink (pink-100) for a transparent-like blend */
+    /* Icon size is set in JS: size={64} */
+}
+
+/* Styles for the text overlay */
+.modal-button-text {
+    position: relative; /* Keep text above the absolute icon */
+    z-index: 10; /* Ensure text is on top */
+    color: #fff; /* Text color */
+    font-weight: 700; /* Bold text */
+    font-size: 1.25rem; /* Larger font size */
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3); /* Subtle shadow for readability */
+}
+
+
+.modal-close-button {
+    background: none;
+    border: 2px solid #db2777; /* pink-700 border */
+    color: #db2777; /* pink-700 text */
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+    margin-top: 1rem; /* Space above the close button */
+}
+
+.modal-close-button:hover {
+    background-color: #fce7f3; /* light pink background */
+    color: #be185d; /* darker pink text */
+    transform: translateY(-2px);
+}
+
+/* Media query for larger screens to arrange buttons side-by-side */
+@media (min-width: 640px) { /* sm breakpoint or similar */
+    .modal-store-options {
+        flex-direction: row;
+        justify-content: center;
+    }
+    .modal-store-button {
+        width: auto; /* Auto width for side-by-side */
+        flex: 1; /* Distribute space evenly */
+        max-width: 180px; /* Max width per button */
+    }
+}

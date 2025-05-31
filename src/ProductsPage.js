@@ -5,8 +5,8 @@ import './ProductsPage.css'; // Make sure this path is correct
 import { db } from './firebaseConfig'; // Your initialized Firestore instance
 import { collection, query, where, getDocs, orderBy as firebaseOrderBy } from 'firebase/firestore';
 
-// Import icons from lucide-react (or other icon library you prefer)
-import { Filter, ListFilter, IndianRupee, ShoppingCart, Loader2, XCircle, MapPin } from 'lucide-react'; // Added MapPin for store icon example
+// Import icons from lucide-react
+import { Filter, ListFilter, IndianRupee, ShoppingCart, Loader2, XCircle } from 'lucide-react';
 
 function ProductsPage() {
     const { gender, subcategoryName } = useParams();
@@ -16,7 +16,11 @@ function ProductsPage() {
     const [productError, setProductError] = useState('');
 
     // Filter states
-    const [selectedStore, setSelectedStore] = useState('All'); // Initial state 'All' or a specific default store like 'Mumbai'
+    // Initialize selectedStore from localStorage, defaulting to 'All' if not found
+    const [selectedStore, setSelectedStore] = useState(() => {
+        const storedStore = localStorage.getItem('selectedStore');
+        return storedStore || 'All';
+    });
     const [selectedColor, setSelectedColor] = useState('All');
     const [selectedSize, setSelectedSize] = useState('All');
     const [sortBy, setSortBy] = useState('rentAsc'); // 'rentAsc', 'rentDesc', 'newest'
@@ -28,9 +32,7 @@ function ProductsPage() {
     const [dynamicStores, setDynamicStores] = useState([]);
     const [dynamicColors, setDynamicColors] = useState([]);
     const [dynamicSizes, setDynamicSizes] = useState([]);
-
-    // State for initial store selection overlay
-    const [showInitialStoreSelection, setShowInitialStoreSelection] = useState(true); // Set to true to show the initial modal
+  
 
     // --- Fetch Dynamic Filter Options from Firebase ---
     useEffect(() => {
@@ -38,9 +40,9 @@ function ProductsPage() {
             try {
                 // Fetch Stores from 'filterOptions/stores/list' collection
                 const storesSnapshot = await getDocs(collection(db, 'filterOptions', 'stores', 'list'));
+                // Map document IDs to store names. If you have a 'name' field in documents, use doc.data().name
                 const fetchedStores = storesSnapshot.docs.map(doc => doc.id);
-                // Ensure 'All' is not included in the initial selection options, only in the filter dropdown later
-                setDynamicStores(['All', ...fetchedStores]);
+                setDynamicStores(['All', ...fetchedStores]); // Add 'All' option
 
                 // Fetch Colors from 'filterOptions/colors/list' collection
                 const colorsSnapshot = await getDocs(collection(db, 'filterOptions', 'colors', 'list'));
@@ -54,22 +56,17 @@ function ProductsPage() {
 
             } catch (error) {
                 console.error("Error fetching filter options:", error);
+                // In case of error, filters might appear empty or non-functional.
+                // Consider adding default hardcoded values here as a fallback if needed for production.
             }
         };
 
         fetchFilterOptions();
     }, []); // Empty dependency array means this runs once on component mount
 
-    // --- Firebase Data Fetching for Products ---
+    // --- Firebase Data Fetching for Products (remains largely the same) ---
     useEffect(() => {
         const fetchProducts = async () => {
-            // Prevent fetching if the initial store selection modal is active and no store is chosen
-            if (showInitialStoreSelection && selectedStore === 'All') {
-                setLoadingProducts(false); // Ensure loading is false
-                setProductError('Please select a store to view products.'); // Update message
-                return;
-            }
-
             setLoadingProducts(true);
             setProductError('');
             setProducts([]); // Clear previous products
@@ -159,7 +156,7 @@ function ProductsPage() {
         };
 
         fetchProducts();
-    }, [gender, subcategoryName, selectedStore, selectedColor, selectedSize, sortBy, showInitialStoreSelection]); // Added showInitialStoreSelection as a dependency
+    }, [gender, subcategoryName, selectedStore, selectedColor, selectedSize, sortBy]); // Dependencies for useEffect
 
     // Handlers for filter/sort changes
     const handleStoreChange = (e) => setSelectedStore(e.target.value);
@@ -167,21 +164,14 @@ function ProductsPage() {
     const handleSizeChange = (e) => setSelectedSize(e.target.value);
     const handleSortByChange = (e) => setSortBy(e.target.value);
 
-    // Modified handler for initial store selection (now for cards)
-    const handleInitialStoreSelect = (storeName) => {
-        setSelectedStore(storeName);
-        setShowInitialStoreSelection(false); // Hide the prompt after selection
-    };
-
     // Clear all filters
     const clearFilters = () => {
         setSelectedStore('All');
         setSelectedColor('All');
         setSelectedSize('All');
         setSortBy('rentAsc');
-        // If you clear filters, you might want to bring back the initial selection prompt
-        // if you want to force selection again. Otherwise, don't uncomment the line below.
-        // setShowInitialStoreSelection(true);
+        // Optionally, remove the selected store from localStorage when filters are cleared
+        localStorage.removeItem('selectedStore');
     };
 
     // Toggle mobile filters visibility
@@ -191,34 +181,6 @@ function ProductsPage() {
 
     return (
         <div className="products-page">
-            {/* Initial Store Selection Overlay/Modal */}
-            {showInitialStoreSelection && (
-                <div className="initial-store-overlay">
-                    <div className="initial-store-modal">
-                        <h2>Select Your Preferred Store</h2>
-                        <p>Please choose a store to view available products.</p>
-                        <div className="store-cards-container"> {/* New container for cards */}
-                            {/* Filter out 'All' from options in the initial modal as it's meant for specific selection */}
-                            {dynamicStores.filter(store => store !== 'All').map(store => (
-                                <div
-                                    key={store}
-                                    className={`store-card ${selectedStore === store ? 'selected' : ''}`}
-                                    onClick={() => handleInitialStoreSelect(store)}
-                                >
-                                    <MapPin size={32} className="store-icon" /> {/* Example icon */}
-                                    <span className="store-name">{store}</span>
-                                </div>
-                            ))}
-                        </div>
-                        {selectedStore !== 'All' && ( // Show continue button only if a store is selected
-                            <button className="confirm-store-btn" onClick={() => setShowInitialStoreSelection(false)}>
-                                View Products
-                            </button>
-                        )}
-                    </div>
-                </div>
-            )}
-
             <header className="products-header">
                 <div className="products-header-content">
                     <h1 className="products-title">{subcategoryName} Collection</h1>
@@ -339,12 +301,7 @@ function ProductsPage() {
                 </aside>
 
                 <main className="products-listing">
-                    {/* Conditional rendering based on initial selection, loading, error, products */}
-                    {showInitialStoreSelection ? (
-                        <div className="message-container">
-                            <p className="message-text">Please select a store from the overlay to view products.</p>
-                        </div>
-                    ) : loadingProducts ? (
+                    {loadingProducts ? (
                         <div className="message-container loading">
                             <Loader2 size={48} className="animate-spin text-blue-500" />
                             <p className="message-text">Fetching amazing products...</p>

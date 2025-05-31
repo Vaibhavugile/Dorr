@@ -1,24 +1,33 @@
+// HomePage.js
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom'; // Import the Link component
+import { Link } from 'react-router-dom';
 import './HomePage.css';
-import useScrollReveal from './hooks/useScrollReveal'; // Import the custom hook
+import useScrollReveal from './hooks/useScrollReveal';
 
 // Import icons from lucide-react
-import { ChevronRight, Sparkles, Shirt, Crown, User, Mail, Phone, MapPin, Instagram, Facebook, Twitter, Clock, Wand2 } from 'lucide-react';
+import { ChevronRight, Sparkles, Shirt, Crown, User, Mail, Phone, MapPin, Instagram, Facebook, Twitter, Clock, Wand2, Loader2 } from 'lucide-react'; // Added Loader2 for loading state
 
 // Import Firebase
-import { db } from './firebaseConfig'; // Import your initialized Firestore instance
-import { collection, getDocs, query, orderBy } from 'firebase/firestore'; // Import necessary Firestore functions
+import { db } from './firebaseConfig';
+import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 
 function HomePage() {
-  // State for categories fetched from Firebase
   const [menCategories, setMenCategories] = useState([]);
   const [womenCategories, setWomenCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [categoryError, setCategoryError] = useState('');
- const [allProducts, setAllProducts] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [productFetchError, setProductFetchError] = useState('');
+
+  // Store Locations Data - Now fetched dynamically
+  const [storeLocations, setStoreLocations] = useState([]);
+  const [loadingStores, setLoadingStores] = useState(true);
+  const [storeError, setStoreError] = useState('');
+
+  // NEW STATE: State for modal visibility
+  const [showStoreModal, setShowStoreModal] = useState(true);
+
   // Data for Testimonials (can also be fetched from Firebase)
   const testimonials = [
     {
@@ -38,22 +47,6 @@ function HomePage() {
     }
   ];
 
-  // Store Locations Data - Updated for names only on cards and specific city images for slider
-  const storeLocations = [
-    {
-      name: 'Camp, Pune',
-      image: 'https://placehold.co/1200x600/404040/e0e0e0?text=Shaniwar+Wada,+Pune' // Shaniwar Wada (Dark Gray)
-    },
-    {
-      name: 'Wakad, Pune',
-      image: 'https://placehold.co/1200x600/262626/d0d0d0?text=Hinjewadi+IT+Park,+Pune' // Hinjewadi IT Park (Darker Gray)
-    },
-    {
-      name: 'Nagpur',
-      image: 'https://placehold.co/1200x600/505050/f5f5f5?text=Deekshabhoomi,+Nagpur' // Deekshabhoomi (Medium Gray)
-    },
-  ];
-
   // State for the image slider
   const [currentSlide, setCurrentSlide] = useState(0);
   // State for mobile menu open/close
@@ -65,19 +58,17 @@ function HomePage() {
   const [isLoadingAdvice, setIsLoadingAdvice] = useState(false);
   const [adviceError, setAdviceError] = useState('');
 
-  // --- Firebase Data Fetching ---
+  // --- Firebase Data Fetching for Categories ---
   useEffect(() => {
     const fetchCategories = async () => {
       setLoadingCategories(true);
       setCategoryError('');
       try {
-        // Fetch Men's Categories
         const menQuery = query(collection(db, 'menCategories'), orderBy('order'));
         const menSnapshot = await getDocs(menQuery);
         const menData = menSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setMenCategories(menData);
 
-        // Fetch Women's Categories
         const womenQuery = query(collection(db, 'womenCategories'), orderBy('order'));
         const womenSnapshot = await getDocs(womenQuery);
         const womenData = womenSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -92,15 +83,39 @@ function HomePage() {
     };
 
     fetchCategories();
-  }, []); // Empty dependency array means this runs once on mount
+  }, []);
+
+  // --- Firebase Data Fetching for Stores ---
+  useEffect(() => {
+    const fetchStores = async () => {
+      setLoadingStores(true);
+      setStoreError('');
+      try {
+        const storesCollectionRef = collection(db, 'filterOptions', 'stores', 'list');
+        const storeSnapshot = await getDocs(storesCollectionRef);
+        // Assuming each store document has a 'name' field and potentially an 'image' field
+        const fetchedStores = storeSnapshot.docs.map(doc => ({ id: doc.id, name: doc.id, image: doc.data().imageUrl || `https://placehold.co/1200x600/404040/e0e0e0?text=${doc.id.replace(/\s/g, '+')}` }));
+        setStoreLocations(fetchedStores);
+      } catch (error) {
+        console.error("Error fetching store locations:", error);
+        setStoreError("Failed to load store locations. Please try again.");
+      } finally {
+        setLoadingStores(false);
+      }
+    };
+
+    fetchStores();
+  }, []); // Run once on component mount
 
   // Auto-slide functionality for store images
   useEffect(() => {
-    const slideInterval = setInterval(() => {
-      setCurrentSlide((prevSlide) => (prevSlide + 1) % storeLocations.length);
-    }, 5000); // Change slide every 5 seconds
+    if (storeLocations.length > 0) { // Only start slider if stores are loaded
+      const slideInterval = setInterval(() => {
+        setCurrentSlide((prevSlide) => (prevSlide + 1) % storeLocations.length);
+      }, 5000);
 
-    return () => clearInterval(slideInterval); // Clear interval on component unmount
+      return () => clearInterval(slideInterval);
+    }
   }, [storeLocations.length]);
 
   // Function to handle dot clicks for slider
@@ -130,7 +145,6 @@ function HomePage() {
       chatHistory.push({ role: "user", parts: [{ text: prompt }] });
 
       const payload = { contents: chatHistory };
-      // API key is handled by the Canvas environment for gemini-2.0-flash
       const apiKey = "AIzaSyB8Qs1DCfin_qFAoo19CDAe8I3qnkmaj0U";
       const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
@@ -169,21 +183,52 @@ function HomePage() {
   const [aboutUsRef, aboutUsIsVisible] = useScrollReveal({ threshold: 0.2 });
   const [testimonialsRef, testimonialsIsVisible] = useScrollReveal({ threshold: 0.2 });
 
-
   return (
     <div className="home-page">
+      {/* Store Selection Modal */}
+      {showStoreModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2 className="modal-title">Welcome to Dress On Rent !</h2>
+            <p className="modal-description">Please select your preferred store location to start Browse our collections.</p>
+            {loadingStores ? (
+              <div className="modal-loading">
+                <Loader2 size={32} className="animate-spin text-blue-500" />
+                <p>Loading stores...</p>
+              </div>
+            ) : storeError ? (
+              <p className="modal-error">{storeError}</p>
+            ) : (
+              <div className="modal-store-options">
+                {storeLocations.map((store) => (
+                  <button
+                    key={store.id}
+                    className="btn btn-primary modal-store-button"
+                    onClick={() => {
+                      localStorage.setItem('selectedStore', store.name);
+                      setShowStoreModal(false);
+                    }}
+                  >
+                    <div className="modal-button-icon-bg">
+                      <Crown size={64} className="modal-button-icon" />
+                    </div>
+                    <span className="modal-button-text">{store.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="header">
         <div className="header-container">
-          {/* Logo on the left with continuous pulse animation */}
           <a href="#" className="header-logo animate-pulse-custom">
             RentMyDress
           </a>
-
-          {/* Navigation links and hamburger icon on the right */}
           <div className="header-nav-wrapper">
             <nav className="desktop-nav">
-              {/* Navigation Links with Hover Underline */}
               <a href="#men" className="nav-link group">
                 Men
                 <span className="nav-link-underline"></span>
@@ -209,7 +254,6 @@ function HomePage() {
                 <span className="nav-link-underline"></span>
               </a>
             </nav>
-            {/* Mobile Menu Button (Hamburger) with rotation animation */}
             <button
               className={`mobile-menu-button animate-slow-spin ${isMobileMenuOpen ? 'rotate-90' : ''}`}
               onClick={toggleMobileMenu}
@@ -221,7 +265,6 @@ function HomePage() {
             </button>
           </div>
         </div>
-        {/* Mobile Navigation */}
         {isMobileMenuOpen && (
           <nav className="mobile-nav">
             <ul className="mobile-nav-list">
@@ -241,23 +284,32 @@ function HomePage() {
         ref={storesRef}
         className={`section bg-white ${storesIsVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'}`}>
         <div className="container text-center">
-          <h2 className="section-title">Our Stores</h2> {/* Changed title for brevity */}
-          <div className="grid-3-col gap-8">
-            {storeLocations.map((store, index) => (
-              <div key={index} className="store-card">
-                <img
-                  src={store.image}
-                  alt={store.name}
-                  className="store-card-image"
-                  onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/400x300/cccccc/333333?text=${store.name}`; }}
-                />
-                <h3 className="card-title">{store.name}</h3>
-                <button className="btn btn-primary mt-4">
-                  View Map
-                </button>
-              </div>
-            ))}
-          </div>
+          <h2 className="section-title">Our Stores</h2>
+          {loadingStores ? (
+            <div className="message-container loading">
+                <Loader2 size={48} className="animate-spin text-blue-500" />
+                <p className="message-text">Loading stores...</p>
+            </div>
+          ) : storeError ? (
+            <p className="message-container error">{storeError}</p>
+          ) : storeLocations.length === 0 ? (
+            <p className="message-container no-products">No store locations found.</p>
+          ) : (
+            <div className="grid-3-col gap-8">
+              {storeLocations.map((store) => (
+                <div key={store.id} className="store-card">
+                  <img
+                    src={store.image}
+                    alt={store.name}
+                    className="store-card-image"
+                    onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/400x300/cccccc/333333?text=${store.name}`; }}
+                  />
+                  <h3 className="card-title">{store.name}</h3>
+                  
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -265,27 +317,40 @@ function HomePage() {
       <section className={`section bg-neutral-100 overflow-hidden ${sliderIsVisible ? 'animate-fade-in' : 'opacity-0'}`} ref={sliderRef}>
         <div className="container">
           <h2 className="section-title">A Glimpse of Our Stores</h2>
-          <div className="slider-container">
-            {storeLocations.map((store, index) => (
-              <img
-                key={index}
-                src={store.image}
-                alt={store.name}
-                className={`slider-image ${index === currentSlide ? 'active-slide' : 'hidden-slide'}`}
-                onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/1200x600/cccccc/333333?text=${store.name}+Store`; }}
-              />
-            ))}
-            <div className="slider-dots">
-              {storeLocations.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => goToSlide(index)}
-                  className={`dot ${index === currentSlide ? 'active-dot' : ''}`}
-                  aria-label={`Go to slide ${index + 1}`}
-                ></button>
-              ))}
+          {loadingStores ? (
+            <div className="message-container loading">
+                <Loader2 size={48} className="animate-spin text-blue-500" />
+                <p className="message-text">Loading store images...</p>
             </div>
-          </div>
+          ) : storeError ? (
+            <p className="message-container error">{storeError}</p>
+          ) : storeLocations.length === 0 ? (
+            <p className="message-container no-products">No store images available.</p>
+          ) : (
+            <>
+              <div className="slider-container">
+                {storeLocations.map((store, index) => (
+                  <img
+                    key={store.id}
+                    src={store.image}
+                    alt={store.name}
+                    className={`slider-image ${index === currentSlide ? 'active-slide' : 'hidden-slide'}`}
+                    onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/1200x600/cccccc/333333?text=${store.name}+Store`; }}
+                  />
+                ))}
+                <div className="slider-dots">
+                  {storeLocations.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => goToSlide(index)}
+                      className={`dot ${index === currentSlide ? 'active-dot' : ''}`}
+                      aria-label={`Go to slide ${index + 1}`}
+                    ></button>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </section>
 
@@ -303,7 +368,6 @@ function HomePage() {
           ) : (
             <div className="grid-4-col gap-8">
               {menCategories.map((category) => (
-                // Changed div to Link component for navigation
                 <Link to={`/collection/men/${category.name}`} key={category.id} className="category-card animate-pop-in">
                   <img
                     src={category.image}
@@ -336,7 +400,6 @@ function HomePage() {
           ) : (
             <div className="grid-5-col gap-8">
               {womenCategories.map((category) => (
-                // Changed div to Link component for navigation
                 <Link to={`/collection/women/${category.name}`} key={category.id} className="category-card alt-card animate-pop-in">
                   <img
                     src={category.image}
@@ -356,11 +419,10 @@ function HomePage() {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" ref={howItWorksRef} className={`section bg-white ${howItWorksIsVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'}`}>
+      <section id="how-it-works" ref={howItWorksRef} className={`section bg-white ${howItWorksIsVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'}`} style={{transitionDelay: '0.1s'}}>
         <div className="container text-center">
           <h2 className="section-title">How It Works</h2>
           <div className="grid-3-col gap-12">
-            {/* Added scroll-reveal-delay and fade-in-up for sequential animation */}
             <div className={`how-it-works-step-card ${howItWorksIsVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'}`} style={{transitionDelay: '0.1s'}}>
               <div className="how-it-works-icon-wrapper">
                 <Sparkles size={36} className="how-it-works-icon" />
@@ -410,7 +472,7 @@ function HomePage() {
                 <>
                   <svg className="spinner-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="spinner-path-1" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="spinner-path-2" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <path className="spinner-path-2" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                   Getting Advice...
                 </>
@@ -453,7 +515,7 @@ function HomePage() {
           <h2 className="section-title">What Our Customers Say</h2>
           <div className="grid-3-col gap-8">
             {testimonials.map((testimonial, index) => (
-              <div key={index} className="testimonial-card animate-pop-in" style={{transitionDelay: `${index * 0.1}s`}}> {/* Sequential pop-in */}
+              <div key={index} className="testimonial-card animate-pop-in" style={{transitionDelay: `${index * 0.1}s`}}>
                 <p className="testimonial-quote">"{testimonial.quote}"</p>
                 <p className="testimonial-author">{testimonial.author}</p>
                 <p className="testimonial-city">{testimonial.city}</p>
@@ -466,7 +528,6 @@ function HomePage() {
       {/* Footer */}
       <footer id="contact" className="footer">
         <div className="footer-container">
-          {/* About Column */}
           <div className="footer-col">
             <h3 className="footer-heading">RentMyDress</h3>
             <p className="footer-text">
@@ -479,7 +540,6 @@ function HomePage() {
             </div>
           </div>
 
-          {/* Quick Links Column */}
           <div className="footer-col">
             <h3 className="footer-heading">Quick Links</h3>
             <ul className="footer-list">
@@ -491,7 +551,6 @@ function HomePage() {
             </ul>
           </div>
 
-          {/* Contact Info Column */}
           <div className="footer-col">
             <h3 className="footer-heading">Contact Us</h3>
             <ul className="footer-list">
@@ -500,9 +559,7 @@ function HomePage() {
               <li className="contact-item align-start"><MapPin size={18} className="icon-mr mt-1" />
                 <address className="address-text">
                   Our Stores:<br/>
-                  Camp, Pune<br/>
-                  Wakad, Pune<br/>
-                  Nagpur
+                  {loadingStores ? 'Loading...' : storeError ? 'Error loading stores' : storeLocations.map(store => store.name).join(', ')}
                 </address>
               </li>
             </ul>
