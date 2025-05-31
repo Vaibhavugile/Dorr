@@ -5,7 +5,7 @@ import './HomePage.css';
 import useScrollReveal from './hooks/useScrollReveal';
 
 // Import icons from lucide-react
-import { ChevronRight, Sparkles, Shirt, Crown, User, Mail, Phone, MapPin, Instagram, Facebook, Twitter, Clock, Wand2, Loader2,Star } from 'lucide-react'; // Added Loader2 for loading state
+import { ChevronRight, Sparkles, Shirt, Crown, User, Mail, Phone, MapPin, Instagram, Facebook, Twitter, Clock, Wand2, Loader2, Star, Menu } from 'lucide-react'; // Added Loader2 for loading state
 
 // Import Firebase
 import { db } from './firebaseConfig';
@@ -27,7 +27,25 @@ function HomePage() {
 
   // NEW STATE: State for modal visibility
   const [showStoreModal, setShowStoreModal] = useState(true);
+  // NEW STATE for scroll effect
+  const [scrolled, setScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  // Effect for scroll to add/remove 'scrolled' class
+  useEffect(() => {
+    const handleScroll = () => {
+      const offset = window.scrollY;
+      if (offset > 50) { // Adjust this value as needed
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
 
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
   // Data for Testimonials (can also be fetched from Firebase)
   const testimonials = [
     {
@@ -49,16 +67,16 @@ function HomePage() {
       rating: 4
     },
     {
-        quote: "The dress I rented for my friend's reception was beautiful and in perfect condition. Great value for money!",
-        author: "Sneha Reddy",
-        city: "Koregaon Park, Pune",
-        rating: 5
+      quote: "The dress I rented for my friend's reception was beautiful and in perfect condition. Great value for money!",
+      author: "Sneha Reddy",
+      city: "Koregaon Park, Pune",
+      rating: 5
     },
     {
-        quote: "Very easy process from selection to return. The outfit was exactly as described and suited my event perfectly.",
-        author: "John Doe",
-        city: "Baner, Pune",
-        rating: 4
+      quote: "Very easy process from selection to return. The outfit was exactly as described and suited my event perfectly.",
+      author: "John Doe",
+      city: "Baner, Pune",
+      rating: 4
     }
   ];
 
@@ -66,7 +84,6 @@ function HomePage() {
   // State for the image slider
   const [currentSlide, setCurrentSlide] = useState(0);
   // State for mobile menu open/close
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // State for Style Advisor feature
   const [eventDescription, setEventDescription] = useState('');
@@ -173,8 +190,8 @@ function HomePage() {
       const result = await response.json();
 
       if (result.candidates && result.candidates.length > 0 &&
-          result.candidates[0].content && result.candidates[0].content.parts &&
-          result.candidates[0].content.parts.length > 0) {
+        result.candidates[0].content && result.candidates[0].content.parts &&
+        result.candidates[0].content.parts.length > 0) {
         const text = result.candidates[0].content.parts[0].text;
         setStyleAdvice(text);
       } else {
@@ -238,10 +255,10 @@ function HomePage() {
       )}
 
       {/* Header */}
-      <header className="header">
+      <header className={`header ${scrolled ? 'scrolled' : ''}`}>
         <div className="header-container">
           <a href="#" className="header-logo animate-pulse-custom">
-            RentMyDress
+            Dress On<span> Rent</span> {/* Added span for accent color */}
           </a>
           <div className="header-nav-wrapper">
             <nav className="desktop-nav">
@@ -269,15 +286,19 @@ function HomePage() {
                 Franchise
                 <span className="nav-link-underline"></span>
               </a>
+              {/* New Call to Action Button */}
+              <a href="#men" className="cta-button">
+                Rent Now
+                <ChevronRight size={18} className="icon-right" />
+              </a>
             </nav>
             <button
               className={`mobile-menu-button animate-slow-spin ${isMobileMenuOpen ? 'rotate-90' : ''}`}
               onClick={toggleMobileMenu}
               aria-expanded={isMobileMenuOpen}
             >
-              <svg className="icon-size" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-              </svg>
+              {/* Replaced SVG with Lucide icon */}
+              <Menu size={28}  />
             </button>
           </div>
         </div>
@@ -290,6 +311,12 @@ function HomePage() {
               <li><a href="#contact" className="mobile-nav-item" onClick={toggleMobileMenu}>Contact Us</a></li>
               <li><a href="#rent-with-us" className="mobile-nav-item" onClick={toggleMobileMenu}>Rent with Us</a></li>
               <li><a href="#franchise" className="mobile-nav-item" onClick={toggleMobileMenu}>Franchise</a></li>
+              {/* Mobile CTA Button if desired, or just direct them to sections */}
+              <li>
+                <a href="#men" className="mobile-nav-item" onClick={toggleMobileMenu} style={{ color: '#db2777', fontWeight: 'bold' }}>
+                  Rent Now
+                </a>
+              </li>
             </ul>
           </nav>
         )}
@@ -303,8 +330,8 @@ function HomePage() {
           <h2 className="section-title">Our Stores</h2>
           {loadingStores ? (
             <div className="message-container loading">
-                <Loader2 size={48} className="animate-spin text-blue-500" />
-                <p className="message-text">Loading stores...</p>
+              <Loader2 size={48} className="animate-spin text-blue-500" />
+              <p className="message-text">Loading stores...</p>
             </div>
           ) : storeError ? (
             <p className="message-container error">{storeError}</p>
@@ -321,7 +348,7 @@ function HomePage() {
                     onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/400x300/cccccc/333333?text=${store.name}`; }}
                   />
                   <h3 className="card-title">{store.name}</h3>
-                  
+
                 </div>
               ))}
             </div>
@@ -335,8 +362,8 @@ function HomePage() {
           <h2 className="section-title">A Glimpse of Our Stores</h2>
           {loadingStores ? (
             <div className="message-container loading">
-                <Loader2 size={48} className="animate-spin text-blue-500" />
-                <p className="message-text">Loading store images...</p>
+              <Loader2 size={48} className="animate-spin text-blue-500" />
+              <p className="message-text">Loading store images...</p>
             </div>
           ) : storeError ? (
             <p className="message-container error">{storeError}</p>
@@ -435,25 +462,25 @@ function HomePage() {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" ref={howItWorksRef} className={`section bg-white ${howItWorksIsVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'}`} style={{transitionDelay: '0.1s'}}>
+      <section id="how-it-works" ref={howItWorksRef} className={`section bg-white ${howItWorksIsVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '0.1s' }}>
         <div className="container text-center">
           <h2 className="section-title">How It Works</h2>
           <div className="grid-3-col">
-            <div className={`how-it-works-step-card ${howItWorksIsVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'}`} style={{transitionDelay: '0.1s'}}>
+            <div className={`how-it-works-step-card ${howItWorksIsVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '0.1s' }}>
               <div className="how-it-works-icon-wrapper">
                 <Sparkles size={36} className="how-it-works-icon" />
               </div>
               <h3 className="card-title">1. Choose Your Outfit</h3>
               <p className="step-description">Browse our extensive collection of designer dresses and suits for all occasions.</p>
             </div>
-            <div className={`how-it-works-step-card ${howItWorksIsVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'}`} style={{transitionDelay: '0.2s'}}>
+            <div className={`how-it-works-step-card ${howItWorksIsVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '0.2s' }}>
               <div className="how-it-works-icon-wrapper">
                 <Shirt size={36} className="how-it-works-icon" />
               </div>
               <h3 className="card-title">2. Select Dates & Size</h3>
               <p className="step-description">Pick your rental period and find your perfect fit with our detailed size guides.</p>
             </div>
-            <div className={`how-it-works-step-card ${howItWorksIsVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'}`} style={{transitionDelay: '0.3s'}}>
+            <div className={`how-it-works-step-card ${howItWorksIsVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '0.3s' }}>
               <div className="how-it-works-icon-wrapper">
                 <Crown size={36} className="how-it-works-icon" />
               </div>
@@ -526,24 +553,24 @@ function HomePage() {
       </section>
 
       {/* Testimonials Section */}
-       <section ref={testimonialsRef} className={`section bg-white ${testimonialsIsVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'}`}>
+      <section ref={testimonialsRef} className={`section bg-white ${testimonialsIsVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'}`}>
         <div className="container text-center">
           <h2 className="section-title">What Our Customers Say</h2>
           <div className="grid-3-col gap-8">
             {testimonials.map((testimonial, index) => (
-              <div key={index} className="testimonial-card animate-pop-in" style={{transitionDelay: `${index * 0.1}s`}}>
+              <div key={index} className="testimonial-card animate-pop-in" style={{ transitionDelay: `${index * 0.1}s` }}>
                 <p className="testimonial-quote">"{testimonial.quote}"</p>
                 {/* Display stars for rating */}
                 <div className="testimonial-rating">
-                    {[...Array(5)].map((_, i) => (
-                        <Star
-                            key={i}
-                            size={16}
-                            fill={i < testimonial.rating ? '#FFD700' : 'none'} // Gold for filled stars
-                            stroke={i < testimonial.rating ? '#FFD700' : '#d1d5db'} // Stroke color
-                            className="inline-block"
-                        />
-                    ))}
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      size={16}
+                      fill={i < testimonial.rating ? '#FFD700' : 'none'} // Gold for filled stars
+                      stroke={i < testimonial.rating ? '#FFD700' : '#d1d5db'} // Stroke color
+                      className="inline-block"
+                    />
+                  ))}
                 </div>
                 <p className="testimonial-author">{testimonial.author}</p>
                 <p className="testimonial-city">{testimonial.city}</p>
@@ -553,7 +580,7 @@ function HomePage() {
           {/* Add a link to your Google My Business reviews */}
           <div className="mt-8 text-center">
             <a
-              href="https://www.google.com/maps/place/DOR+-+Dress+On+Rent/@18.510647,73.8701188,17z/data=!4m8!3m7!1s0x3bc2bf5a58dc7161:0x19aab6f082d33f00!8m2!3d18.510647!4d73.8726937!9m1!1b1!16s%2Fg%2F11f79pz3t4?entry=ttu&g_ep=EgoyMDI1MDUyOC4wIKXMDSoASAFQAw%3D%3D" 
+              href="https://www.google.com/maps/place/DOR+-+Dress+On+Rent/@18.510647,73.8701188,17z/data=!4m8!3m7!1s0x3bc2bf5a58dc7161:0x19aab6f082d33f00!8m2!3d18.510647!4d73.8726937!9m1!1b1!16s%2Fg%2F11f79pz3t4?entry=ttu&g_ep=EgoyMDI1MDUyOC4wIKXMDSoASAFQAw%3D%3D"
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-primary animate-button-press"
@@ -597,7 +624,7 @@ function HomePage() {
               <li className="contact-item"><Phone size={18} className="icon-mr" /> +91 98765 43210</li>
               <li className="contact-item align-start"><MapPin size={18} className="icon-mr mt-1" />
                 <address className="address-text">
-                  Our Stores:<br/>
+                  Our Stores:<br />
                   {loadingStores ? 'Loading...' : storeError ? 'Error loading stores' : storeLocations.map(store => store.name).join(', ')}
                 </address>
               </li>

@@ -1,3 +1,4 @@
+
 /* Base Styles */
 .home-page {
     min-height: 100vh;
@@ -135,13 +136,27 @@
 }
 
 /* --- Header --- */
+/* HomePage.css */
+
+/* --- Header --- */
 .header {
-    background-color: #f5f5f5; /* neutral-100 */
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+    /* Updated background with gradient */
+    background: linear-gradient(to right, #f8f8f8, #f0f0f0);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08); /* shadow-md initially */
     position: sticky;
     top: 0;
     z-index: 50;
-    transition: box-shadow 0.3s ease;
+    transition: all 0.3s ease-in-out; /* Smooth transition for all changes */
+    border-bottom: 1px solid #eee; /* Subtle bottom border */
+    border-radius: 0 0 0.5rem 0.5rem; /* Soften bottom corners */
+}
+
+/* Styles for header when scrolled */
+.header.scrolled {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-lg on scroll */
+    background: linear-gradient(to right, #fdfdfd, #f9f9f9); /* Slightly lighter gradient */
 }
 
 .header-container {
@@ -154,61 +169,124 @@
     margin-right: auto;
     padding-left: 1rem;
     padding-right: 1rem;
+    transition: all 0.3s ease-in-out; /* Smooth transition for padding changes */
+}
+
+.header.scrolled .header-container {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
 }
 
 .header-logo {
-    font-size: 1.5rem; /* text-2xl */
+    font-size: 1.8rem; /* text-3xl for prominence */
     font-weight: 700; /* font-bold */
     color: #171717; /* neutral-900 */
     text-decoration: none;
-    transition: transform 0.2s ease; /* Added for hover */
+    transition: transform 0.2s ease, font-size 0.3s ease; /* Added font-size transition */
+    letter-spacing: -0.025em; /* Tighten tracking slightly */
+}
+.header-logo span { /* For accentuating 'Dress' */
+    color: #db2777; /* pink-700 */
+    margin-left: 0.1rem; /* Space after 'RentMy' */
+    letter-spacing: 0; /* Reset tracking for 'Dress' if needed */
 }
 .header-logo:hover {
     transform: scale(1.02); /* Subtle scale on hover */
+}
+.header.scrolled .header-logo {
+    font-size: 1.6rem; /* Slightly smaller on scroll */
 }
 
 
 .header-nav-wrapper {
     display: flex;
     align-items: center;
+    gap: 1.5rem; /* Space between desktop nav and CTA/mobile button */
 }
 
 .desktop-nav {
     display: none; /* hidden by default on mobile */
-    gap: 2rem; /* space-x-8 */
+    gap: 1.75rem; /* space-x-7 - adjusted for more breathing room */
 }
+
+/* Show desktop nav on medium screens and up */
+@media (min-width: 768px) {
+    .desktop-nav {
+        display: flex;
+    }
+    .mobile-menu-button {
+        display: none; /* Hide mobile button on desktop */
+    }
+}
+
 
 .nav-link {
     position: relative;
     color: #4b5563; /* gray-600 */
-    transition: color 0.3s ease;
+    padding: 0.25rem 0.5rem; /* Added padding for better click area */
+    transition: color 0.3s ease, font-weight 0.3s ease; /* Added font-weight transition */
     text-decoration: none;
+    white-space: nowrap; /* Prevent wrapping */
 }
 
 .nav-link:hover {
     color: #db2777; /* pink-700 */
+    font-weight: 600; /* Make text semi-bold on hover */
 }
 
 .nav-link-underline {
     content: '';
     position: absolute;
-    bottom: -2px; /* Adjusted to be slightly below text */
-    left: 0;
-    width: 0;
+    bottom: 0px; /* Adjusted to be right at the bottom */
+    left: 0.5rem; /* Align with padding */
+    right: 0.5rem; /* Align with padding */
+    width: auto; /* Will be managed by transform scale */
     height: 2px;
     background-color: #db2777; /* pink-700 */
-    transition: width 0.3s ease;
+    transform: scaleX(0); /* Start scaled to 0 */
+    transform-origin: center; /* Scale from center */
+    transition: transform 0.3s ease;
 }
 
 /* Apply underline on group hover */
 .nav-link:hover .nav-link-underline {
-    width: 100%;
+    transform: scaleX(1); /* Scale to 100% on hover */
 }
+
+/* New CTA Button styles */
+.cta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem; /* space-x-2 */
+    background-color: #ec4899; /* pink-500 */
+    color: #fff;
+    padding: 0.6rem 1.25rem; /* py-2.5 px-5 */
+    border-radius: 0.75rem; /* rounded-xl */
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    white-space: nowrap;
+    border: none;
+    cursor: pointer;
+}
+.cta-button:hover {
+    background-color: #db2777; /* pink-700 */
+    transform: translateY(-2px); /* Lift effect */
+    box-shadow: 0 5px 10px rgba(219, 39, 119, 0.4); /* Glow effect */
+}
+.cta-button:active {
+    transform: translateY(0); /* Press down effect */
+    box-shadow: none;
+}
+.cta-button .icon-right {
+    margin-left: 0.25rem; /* Adjust icon spacing */
+}
+
 
 .mobile-menu-button {
     background: none;
     border: none;
-    padding: 0;
+    padding: 0.5rem; /* Add padding for easier tapping */
     cursor: pointer;
     color: #4b5563; /* gray-600 */
     transition: transform 0.3s ease, color 0.3s ease;
@@ -218,6 +296,7 @@
 
 .mobile-menu-button:hover {
     color: #db2777; /* pink-700 */
+    transform: scale(1.1); /* Subtle pop on hover */
 }
 
 .mobile-menu-button:focus {
@@ -225,8 +304,8 @@
 }
 
 .mobile-menu-button .icon-size {
-    width: 1.5rem; /* w-6 */
-    height: 1.5rem; /* h-6 */
+    width: 1.75rem; /* Larger icon */
+    height: 1.75rem; /* Larger icon */
 }
 
 .mobile-menu-button.rotate-90 {
@@ -238,6 +317,7 @@
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-lg */
     padding: 1rem; /* py-4 px-4 */
     display: block; /* always block on mobile when open */
+    border-radius: 0 0 0.5rem 0.5rem;
 }
 
 .mobile-nav-list {
@@ -253,11 +333,13 @@
     display: block;
     color: #374151; /* gray-700 */
     text-decoration: none;
-    transition: color 0.3s ease;
+    padding: 0.5rem 0; /* Added padding */
+    transition: color 0.3s ease, transform 0.2s ease;
 }
 
 .mobile-nav-item:hover {
     color: #db2777; /* pink-700 */
+    transform: translateX(5px); /* Slide effect on hover */
 }
 
 /* --- Sections Common Styles --- */
