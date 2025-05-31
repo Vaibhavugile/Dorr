@@ -311,7 +311,7 @@ function HomePage() {
           ) : storeLocations.length === 0 ? (
             <p className="message-container no-products">No store locations found.</p>
           ) : (
-            <div className="grid-3-col gap-8">
+            <div className="grid-3-col">
               {storeLocations.map((store) => (
                 <div key={store.id} className="store-card">
                   <img
@@ -382,7 +382,7 @@ function HomePage() {
           ) : categoryError ? (
             <p className="text-center text-red-500">{categoryError}</p>
           ) : (
-            <div className="grid-4-col gap-8">
+            <div className="grid-4-col">
               {menCategories.map((category) => (
                 <Link to={`/collection/men/${category.name}`} key={category.id} className="category-card animate-pop-in">
                   <img
@@ -414,7 +414,7 @@ function HomePage() {
           ) : categoryError ? (
             <p className="text-center text-red-500">{categoryError}</p>
           ) : (
-            <div className="grid-5-col gap-8">
+            <div className="grid-5-col">
               {womenCategories.map((category) => (
                 <Link to={`/collection/women/${category.name}`} key={category.id} className="category-card alt-card animate-pop-in">
                   <img
@@ -438,7 +438,7 @@ function HomePage() {
       <section id="how-it-works" ref={howItWorksRef} className={`section bg-white ${howItWorksIsVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'}`} style={{transitionDelay: '0.1s'}}>
         <div className="container text-center">
           <h2 className="section-title">How It Works</h2>
-          <div className="grid-3-col gap-12">
+          <div className="grid-3-col">
             <div className={`how-it-works-step-card ${howItWorksIsVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'}`} style={{transitionDelay: '0.1s'}}>
               <div className="how-it-works-icon-wrapper">
                 <Sparkles size={36} className="how-it-works-icon" />
@@ -466,7 +466,7 @@ function HomePage() {
 
       {/* ✨ Style Advisor Section (Gemini API Integration) ✨ */}
       <section ref={styleAdvisorRef} className={`section bg-neutral-100 text-center ${styleAdvisorIsVisible ? 'animate-fade-in' : 'opacity-0'}`}>
-        <div className="container max-width-3xl">
+        <div className="container">
           <h2 className="section-title">✨ Get Personalized Style Advice ✨</h2>
           <p className="section-description-sub">
             Describe your event, and our AI-powered style advisor will suggest the perfect attire!

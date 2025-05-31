@@ -261,19 +261,36 @@
 }
 
 /* --- Sections Common Styles --- */
+
+
+/* --- Sections Common Styles --- */
+/* Global Reset for Box-Sizing - Highly Recommended */
+html {
+  box-sizing: border-box;
+}
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+/* --- Sections Common Styles --- */
 .section {
     padding-top: 4rem; /* py-16 */
     padding-bottom: 4rem; /* py-16 */
     border-radius: 1.5rem; /* rounded-3xl */
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
-    margin-left: 1rem; /* mx-4 */
-    margin-right: 1rem; /* mx-4 */
     margin-top: 2rem; /* mt-8 */
     position: relative;
     z-index: 20;
     /* Ensure elements are initially off-screen or transparent for scroll animations */
     /* Handled by animate-fade-in-up/animate-fade-in classes now */
     transition: opacity 0.8s ease-out, transform 0.8s ease-out; /* Default transition for elements managed by isVisible */
+
+    /* ADDED: Max-width and margin for the section itself */
+    max-width: 90rem; /* Adjust this value as needed, common for larger containers like max-w-7xl */
+    margin-left: auto; /* Center the section */
+    margin-right: auto; /* Center the section */
+    padding-left: 1rem; /* Add some horizontal padding to prevent content from touching edges on small screens */
+    padding-right: 1rem; /* Add some horizontal padding */
 }
 
 .section-title {
@@ -293,7 +310,6 @@
     opacity: 1;
     transform: translateY(0);
 }
-
 
 .section-description { /* for Men/Women sections */
     text-align: center;
@@ -323,10 +339,10 @@
     max-width: 42rem; /* max-w-2xl */
     margin-left: auto;
     margin-right: auto;
-     /* Add for sequential reveal within the section */
-     opacity: 0;
-     transform: translateY(20px);
-     transition: opacity 0.7s ease-out 0.35s, transform 0.7s ease-out 0.35s; /* More delayed fade in */
+    /* Add for sequential reveal within the section */
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.7s ease-out 0.35s, transform 0.7s ease-out 0.35s; /* More delayed fade in */
 }
 .section-description-sub:last-of-type { /* Remove bottom margin from last paragraph if within same container */
     margin-bottom: 0;
@@ -341,24 +357,111 @@
 /* --- Grid Layouts --- */
 .grid-3-col {
     display: grid;
-    grid-template-columns: 1fr; /* Default to single column */
+    grid-template-columns: 1fr; /* Default to single column for mobile */
     gap: 2rem; /* gap-8 */
+    /* ADDED: Ensure the grid itself fits within its parent */
+    width: 100%;
 }
-.grid-4-col {
-    display: grid;
-    grid-template-columns: 1fr; /* Default to single column */
-    gap: 2rem; /* gap-8 */
-}
-.grid-5-col {
-    display: grid;
-    grid-template-columns: 1fr; /* Default to single column */
-    gap: 2rem; /* gap-8 */
+/* Medium screens (e.g., tablets) */
+@media (min-width: 768px) {
+    .grid-3-col {
+        grid-template-columns: repeat(3, 1fr); /* 3 columns on medium screens and up */
+    }
 }
 
+.grid-4-col {
+    display: grid;
+    grid-template-columns: 1fr; /* Default to single column for mobile */
+    gap: 2rem; /* gap-8 */
+    width: 100%; /* Ensure grid takes full width of its parent */
+}
+/* Small-medium screens (e.g., larger phones, small tablets) */
+@media (min-width: 640px) { /* Tailwind's sm breakpoint */
+    .grid-4-col {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns */
+    }
+}
+/* Medium screens (e.g., tablets) */
+@media (min-width: 768px) { /* Tailwind's md breakpoint */
+    .grid-4-col {
+        grid-template-columns: repeat(3, 1fr); /* 3 columns */
+    }
+}
+/* Large screens (e.g., desktops) */
+@media (min-width: 1024px) { /* Tailwind's lg breakpoint */
+    .grid-4-col {
+        grid-template-columns: repeat(4, 1fr); /* 4 columns on large screens and up */
+    }
+}
+
+.grid-5-col {
+    display: grid;
+    grid-template-columns: 1fr; /* Default to single column for mobile */
+    gap: 2rem; /* gap-8 */
+    width: 100%; /* Ensure grid takes full width of its parent */
+}
+/* Small-medium screens */
+@media (min-width: 640px) {
+    .grid-5-col {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns */
+    }
+}
+/* Medium screens */
+@media (min-width: 768px) {
+    .grid-5-col {
+        grid-template-columns: repeat(3, 1fr); /* 3 columns */
+    }
+}
+/* Large screens */
+@media (min-width: 1024px) {
+    .grid-5-col {
+        grid-template-columns: repeat(4, 1fr); /* 4 columns */
+    }
+}
+/* Extra large screens */
+@media (min-width: 1280px) { /* Tailwind's xl breakpoint */
+    .grid-5-col {
+        grid-template-columns: repeat(5, 1fr); /* 5 columns on extra large screens and up */
+    }
+}
+
+/* --- Ensure Content Within Grid Items is Responsive --- */
+/* This selects any direct child of your grid (which would be your individual grid items) */
+.grid-3-col > *,
+.grid-4-col > *,
+.grid-5-col > * {
+    /* Set a minimum width on grid items, but allow them to shrink */
+    min-width: 0; /* Important for flex/grid items to shrink if content is too wide */
+    overflow: hidden; /* Helps contain content that might exceed the item's bounds */
+}
+
+/* Ensure images inside grid items are responsive */
+.grid-3-col img,
+.grid-4-col img,
+.grid-5-col img {
+    max-width: 100%; /* Images will scale down to fit their parent grid cell */
+    height: auto;    /* Maintain aspect ratio */
+    display: block;  /* Removes extra space below images */
+}
+
+/* For long text content within grid items */
+.grid-3-col p,
+.grid-4-col p,
+.grid-5-col p {
+    word-wrap: break-word;   /* Breaks long words that might overflow */
+    overflow-wrap: break-word; /* Newer syntax for word-wrap */
+}
+
+/* You might want to apply this to all text within grid items if it's overflowing */
+.grid-3-col h1, .grid-3-col h2, .grid-3-col h3, .grid-3-col h4, .grid-3-col h5, .grid-3-col h6,
+.grid-3-col span, .grid-3-col a {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
 /* --- Store Card styles --- */
 .store-card {
     background-color: #fafafa; /* neutral-50 */
-    padding: 1.5rem; /* p-6 */
+    padding: 1rem; /* p-6 */
     border-radius: 0.75rem; /* rounded-xl */
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-lg */
     transition: transform 0.3s ease, box-shadow 0.3s ease; /* Added box-shadow transition */
@@ -541,7 +644,7 @@
     gap: 1rem; /* space-y-4 */
 }
 .style-advisor-textarea {
-    width: 100%;
+    width: 80%;
     padding: 1rem; /* p-4 */
     border-radius: 0.5rem; /* rounded-lg */
     border: 2px solid #d1d5db; /* border-2 border-gray-300 */
