@@ -435,7 +435,7 @@ function HomePage() {
               {menCategories.map((category) => (
                 <Link to={`/collection/men/${category.name}`} key={category.id} className="category-card animate-pop-in">
                   <img
-                    src={category.image}
+                    src={category.imageUrl || category.image}
                     alt={category.name}
                     className="category-card-image"
                     onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/400x300/cccccc/333333?text=${category.name}`; }}
@@ -463,11 +463,11 @@ function HomePage() {
           ) : categoryError ? (
             <p className="text-center text-red-500">{categoryError}</p>
           ) : (
-            <div className="grid-5-col">
+            <div className="grid-4-col">
               {womenCategories.map((category) => (
                 <Link to={`/collection/women/${category.name}`} key={category.id} className="category-card alt-card animate-pop-in">
                   <img
-                    src={category.image}
+                    src={category.imageUrl || category.image}
                     alt={category.name}
                     className="category-card-image"
                     onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/400x300/cccccc/333333?text=${category.name}`; }}

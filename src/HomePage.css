@@ -638,47 +638,110 @@ html {
 }
 
 /* --- Category Cards (Men/Women) --- */
+/* --- Styles for Men's and Women's Subcategory Cards (category-card) --- */
 .category-card {
-    background-color: #fafafa; /* neutral-50 */
-    padding: 1.5rem; /* p-6 */
-    border-radius: 0.75rem; /* rounded-xl */
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-lg */
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Added box-shadow transition */
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+    background-color: #1f2937; /* Solid white background */
+    border-radius: 12px; /* Rounded corners for the entire card */
+    overflow: hidden; /* Ensures content respects border-radius */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
+    display: flex; /* Use flexbox to stack image and content */
+    flex-direction: column; /* Stack items vertically */
+    text-decoration: none; /* Remove underline from the Link component */
+    color: inherit; /* Inherit text color */
 }
+
 .category-card:hover {
+    transform: translateY(-5px); /* Lifts the card slightly on hover */
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05),
-                0 0 20px rgba(219, 39, 119, 0.3); /* Enhanced shadow with strong glow */
-    transform: translateY(-0.75rem); /* Increased lift on hover */
-}
+                0 0 20px rgba(219, 39, 119, 0.3); /* Enhanced shadow with strong glow */}
+
+/* --- Image Styling within Category Cards --- */
 .category-card-image {
-    width: 100%;
-    height: 16rem; /* h-64 */
-    object-fit: cover;
-    object-position: center;
-    transition: transform 0.4s ease; /* Made transition slightly slower */
+    width: 100%; /* Image takes full width of the card */
+    height: 200px; /* Fixed height for consistent image size */
+    object-fit: cover; /* Crops image to cover the area without distortion */
+    /* Only apply border-radius to the top corners, as bottom corners will be covered by content */
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
 }
-.category-card:hover .category-card-image {
-    transform: scale(1.08); /* Increased image scale on hover */
-}
+
+/* --- Content Styling within Category Cards (for title and subtitle) --- */
 .category-card-content {
-    padding-top: 1.5rem; /* p-6 */
-    text-align: center;
-}
-.card-subtitle {
-    color: #db2777; /* pink-700 */
-    font-weight: 500; /* font-medium */
-}
-
-.category-card.alt-card { /* Specifically for women's cards if they need a different background */
-    background-color: #fff; /* bg-white */
+    padding: 15px; /* Padding around the text content */
+    text-align: center; /* Center the text */
+    flex-grow: 1; /* Allows content to take up available space, pushing it to bottom if needed */
+    display: flex; /* Use flex to align title and subtitle */
+    flex-direction: column;
+    justify-content: center; /* Center content vertically if flex-grow isn't needed */
 }
 
+.category-card-content .card-title {
+    font-size: 1.15em; /* Slightly larger font size for the main title */
+    margin-bottom: 5px; /* Small space below the title */
+    color: #fff; /* Dark gray for the title text */
+    font-weight: 600; /* Semi-bold font weight */
+}
+
+.category-card-content .card-subtitle {
+    font-size: 0.9em; /* Smaller font size for the subtitle */
+    color: #777; /* Lighter gray for the subtitle text */
+}
+
+/* --- Grid Layout Adjustments (ensure proper spacing and responsiveness) --- */
+/* (Assuming these grid classes are already defined or will be added) */
+.grid-4-col { /* For Men's section */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px; /* Spacing between cards */
+    justify-content: center;
+}
+
+.grid-5-col { /* For Women's section */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 25px; /* Spacing between cards */
+    justify-content: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .grid-4-col {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+    .grid-5-col {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+    .category-card-image {
+        height: 180px;
+    }
+}
+
+@media (max-width: 768px) {
+    .grid-4-col, .grid-5-col {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 20px;
+    }
+    .category-card-image {
+        height: 150px;
+    }
+    .category-card-content {
+        padding: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .grid-4-col, .grid-5-col {
+        grid-template-columns: 1fr; /* Single column on very small screens */
+        gap: 15px;
+    }
+    .category-card-image {
+        height: 120px;
+    }
+    .category-card-content {
+        padding: 10px;
+    }
+}
 /* --- How It Works Section --- */
 .how-it-works-step-card {
     display: flex;
