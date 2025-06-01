@@ -564,9 +564,9 @@ function HomePage() {
       {/* About Us Section */}
       <section id="about-us" ref={aboutUsRef} className={`section bg-neutral-100 ${aboutUsIsVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'}`}>
         <div className="container max-width-3xl text-center">
-          <h2 className="section-title">About RentMyDress</h2>
+          <h2 className="section-title">About Dress On Rent(DOR)</h2>
           <p className="section-description-sub mb-6">
-            At RentMyDress, we believe in sustainable fashion without compromising on style. We offer a curated selection of high-quality, fashionable attire for both men and women, making luxury accessible for every special moment.
+            At Dress On Rent (DOR), we believe in sustainable fashion without compromising on style. We offer a curated selection of high-quality, fashionable attire for both men and women, making luxury accessible for every special moment.
           </p>
           <p className="section-description-sub">
             With convenient locations in Camp, Wakad (Pune), and Nagpur, we're dedicated to providing an unparalleled rental experience, helping you look your best while being kind to your wallet and the planet.
@@ -617,7 +617,7 @@ function HomePage() {
       <footer id="contact" className="footer">
         <div className="footer-container">
           <div className="footer-col">
-            <h3 className="footer-heading">RentMyDress</h3>
+            <h3 className="footer-heading">Dress On Rent (DOR)</h3>
             <p className="footer-text">
               Your premier destination for high-quality dress and suit rentals. Elevate your style, sustainably and affordably.
             </p>
@@ -642,7 +642,7 @@ function HomePage() {
           <div className="footer-col">
             <h3 className="footer-heading">Contact Us</h3>
             <ul className="footer-list">
-              <li className="contact-item"><Mail size={18} className="icon-mr" /> info@rentmydress.com</li>
+              <li className="contact-item"><Mail size={18} className="icon-mr" /> info@DOR.com</li>
               <li className="contact-item"><Phone size={18} className="icon-mr" /> +91 98765 43210</li>
               <li className="contact-item align-start"><MapPin size={18} className="icon-mr mt-1" />
                 <address className="address-text">
@@ -654,7 +654,7 @@ function HomePage() {
           </div>
         </div>
         <div className="copyright">
-          &copy; {new Date().getFullYear()} RentMyDress. All rights reserved.
+          &copy; {new Date().getFullYear()} DOR. All rights reserved.
         </div>
       </footer>
     </div>
