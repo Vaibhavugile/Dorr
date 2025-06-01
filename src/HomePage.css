@@ -1130,7 +1130,7 @@ address.address-text {
     height: 100%;
     background:
         linear-gradient(to right, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2)), /* Darker gradient overlay from left */
-        url('C:/Users/vaibh/dor/src/assets/weddigng.jpg') center center / cover no-repeat;
+        url('C:/Users/vaibh/dor/src/assets/Gemini_Generated_Image_licw8xlicw8xlicw.png') center center / cover no-repeat;
     /* IMPORTANT: Replace the URL above with your high-resolution hero image! */
     z-index: 1; /* Behind content */
     transform: scale(1.05); /* Slightly scale up for a subtle zoom effect */
@@ -1171,7 +1171,7 @@ address.address-text {
     font-size: 1.625rem; /* text-3xl */
     font-weight: 400; /* Regular weight */
     color: #e2e8f0; /* gray-200 */
-    margin-bottom: 3rem;
+    margin-bottom: 5rem;
     line-height: 1.5;
     max-width: 50rem;
     margin-left: auto;

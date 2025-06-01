@@ -323,27 +323,27 @@ function HomePage() {
       </header>
       {/* Hero Section */}
       {/* Hero Section - Alternative Design */}
-{/* Hero Section - Split Layout Design */}
-{/* Hero Section - Ultimate Design with Background Image */}
-<section className="hero-section-ultimate">
-  <div className="hero-ultimate-background"></div> {/* This will hold the background image and overlay */}
-  <div className="container hero-ultimate-content">
-   
-    <p className="hero-ultimate-description animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-      Step into elegance without compromise. Rent the finest designer wear for your unforgettable moments.
-    </p>
-    <div className="hero-ultimate-buttons animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-      <Link to="#women" className="cta-button hero-ultimate-button-women">
-        Explore Women's Styles
-        <ChevronRight size={18} className="icon-right" />
-      </Link>
-      <Link to="#men" className="cta-button hero-ultimate-button-men">
-        Explore Men's Styles
-        <ChevronRight size={18} className="icon-right" />
-      </Link>
-    </div>
-  </div>
-</section>
+      {/* Hero Section - Split Layout Design */}
+      {/* Hero Section - Ultimate Design with Background Image */}
+      <section className="hero-section-ultimate">
+        <div className="hero-ultimate-background"></div> {/* This will hold the background image and overlay */}
+        <div className="container hero-ultimate-content">
+
+          <p className="hero-ultimate-description animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+            Step into elegance without compromise. Rent the finest designer wear for your unforgettable moments.
+          </p>
+          <div className="hero-ultimate-buttons animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+            <Link to="#women" className="cta-button hero-ultimate-button-women">
+              Explore Women's Styles
+              <ChevronRight size={18} className="icon-right" />
+            </Link>
+            <Link to="#men" className="cta-button hero-ultimate-button-men">
+              Explore Men's Styles
+              <ChevronRight size={18} className="icon-right" />
+            </Link>
+          </div>
+        </div>
+      </section>
       {/* Store Locations Section */}
       <section id="stores-location"
         ref={storesRef}
