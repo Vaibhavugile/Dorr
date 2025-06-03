@@ -922,7 +922,114 @@ html {
 }
 
 
+/* --- About Us Section - Values Grid --- */
+/* --- About Us Section - Split Layout --- */
+.about-us-split-container {
+    display: flex;
+    flex-direction: column; /* Mobile first: image on top of text */
+    align-items: center;
+    gap: 2rem; /* gap-8 */
+}
 
+.about-us-split-image-wrapper {
+    width: 100%;
+    max-width: 480px; /* Adjust as needed */
+    border-radius: 0.75rem; /* rounded-xl */
+    overflow: hidden;
+    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1), 0 4px 8px -4px rgba(0, 0, 0, 0.07); /* shadow-xl variant */
+    
+    /* --- KEY CHANGES FOR STACKED IMAGES --- */
+    display: flex; /* Make it a flex container */
+    flex-direction: column; /* Stack children vertically */
+    gap: 0.5rem; /* Small gap between the two stacked images */
+    /* --- END KEY CHANGES --- */
+
+    align-items: stretch; /* Ensure images stretch to fill width */
+}
+
+.about-us-split-image {
+    width: 100%; /* Each image takes full width of its parent */
+    height: 50%; /* Each image takes 50% of the wrapper's height */
+    object-fit: cover; /* Covers the area, might crop */
+    display: block;
+}
+
+.about-us-split-content-wrapper {
+    width: 100%;
+    max-width: 640px; /* text content max width */
+    text-align: center; /* Mobile: centered text */
+}
+
+.about-us-split-content-wrapper .section-title {
+    font-size: 2rem; /* text-3xl for internal title to differentiate */
+    color: #111827; /* gray-900 */
+    text-align: center; /* Override global section-title for mobile */
+}
+
+.about-us-split-text {
+    font-size: 1rem; /* text-base */
+    line-height: 1.75; /* leading-relaxed */
+    color: #374151; /* gray-700 */
+    margin-bottom: 1.5rem; /* mb-6 */
+}
+
+.about-us-split-highlights {
+    margin-top: 2.5rem; /* mt-10 */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; /* space-y-6 */
+}
+
+.highlight-item {
+    display: flex;
+    align-items: flex-start; /* Align icon with top of text */
+    gap: 1rem; /* space-x-4 */
+    text-align: left; /* Ensure highlight text is left-aligned */
+}
+
+.highlight-icon {
+    flex-shrink: 0; /* Prevent icon from shrinking */
+    margin-top: 0.25rem; /* Adjust vertical alignment if needed */
+}
+
+.highlight-title {
+    font-size: 1.125rem; /* text-lg */
+    font-weight: 600; /* semibold */
+    color: #1f2937; /* gray-800 */
+    margin-bottom: 0.25rem; /* mb-1 */
+}
+
+.highlight-text {
+    font-size: 0.95rem; /* text-sm */
+    color: #4b5563; /* gray-600 */
+    line-height: 1.6;
+}
+
+/* Desktop layout for split screen */
+@media (min-width: 992px) { /* lg breakpoint or your preferred one */
+    .about-us-split-container {
+        flex-direction: row; /* Side-by-side layout */
+        justify-content: space-between;
+        align-items: stretch; /* Crucial: Make sure items stretch to fill height */
+        gap: 4rem; /* More gap on larger screens */
+    }
+
+    .about-us-split-image-wrapper {
+        width: 45%; /* Image section takes up less than half */
+        max-width: none; /* Remove mobile max-width */
+        order: 1; /* Place image section on the left */
+    }
+
+    .about-us-split-content-wrapper {
+        width: 50%; /* Text takes up more than half */
+        text-align: left; /* Left-align text on desktop */
+        order: 2; /* Place text on the right */
+    }
+
+    .about-us-split-content-wrapper .section-title {
+        text-align: left; /* Explicitly left for section title on desktop */
+    }
+}
 /* --- Footer --- */
 .footer {
     background-color: #1f2937; /* gray-800 */

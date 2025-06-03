@@ -178,34 +178,33 @@ function ProductDetailPage() {
     };
 
     const handleEnquire = async () => {
-        if (!product || !selectedSize || (!selectedColor && (product.colors && product.colors.length > 0 && product.color === undefined))) {
-            setModalMessage('Please select a size and color before sending your inquiry.');
-            setModalType('error');
-            setShowModal(true);
-            return;
-        }
+    if (!product) { // Only check if product data is available
+        setModalMessage('Product details are not available for inquiry.');
+        setModalType('error');
+        setShowModal(true);
+        return;
+    }
 
-        try {
-            console.log("Product inquiry simulated:", {
-                productId: product.id,
-                name: product.name,
-                size: selectedSize,
-                color: selectedColor || 'N/A', // Use 'N/A' if no color was selected/available
-                rent: product.rent,
-            });
+    try {
+        const whatsappNumber = '+918446442204'; // Replace with your WhatsApp number
+        // Construct the message without requiring selected size or color
+        const message = `Hello, I'm interested in renting the product "${product.name}" (Product Code: ${product.productCode}).\n\nDetails:\nRent: ₹${product.rent.toLocaleString('en-IN')} for 3 days.\n\nPlease provide more details.`;
 
-            setModalMessage(`Your inquiry for "${product.name}" (${selectedSize}, ${selectedColor || 'N/A'}) has been sent! We will get back to you shortly.`);
-            setModalType('success');
-            setShowModal(true);
+        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
-        } catch (error) {
-            console.error("Error sending inquiry:", error);
-            setModalMessage('Failed to send inquiry. Please try again.');
-            setModalType('error');
-            setShowModal(true);
-        }
-    };
+        window.open(whatsappUrl, '_blank'); // Open in a new tab
 
+        setModalMessage(`Your inquiry for "${product.name}" has been sent! We will get back to you shortly on WhatsApp.`);
+        setModalType('success');
+        setShowModal(true);
+
+    } catch (error) {
+        console.error("Error sending inquiry:", error);
+        setModalMessage('Failed to open WhatsApp. Please ensure you have WhatsApp installed or try again.');
+        setModalType('error');
+        setShowModal(true);
+    }
+};
     const closeModal = () => {
         setShowModal(false);
         setModalMessage('');
@@ -319,7 +318,7 @@ function ProductDetailPage() {
                     <p className="breadcrumb-nav">
                         <Link to="/" className="breadcrumb-link">Home</Link>
                         <span className="breadcrumb-separator"> / </span>
-                        <Link to={`/collection/${gender}`} className="breadcrumb-link">{gender === 'men' ? 'Men' : 'Women'}</Link>
+                        <Link to={`/#${gender}`} className="breadcrumb-link">{gender === 'men' ? 'Men' : 'Women'}</Link>
                         <span className="breadcrumb-separator"> / </span>
                         <Link to={`/collection/${gender}/${subcategoryName}`} className="breadcrumb-link">{subcategoryName}</Link>
                     </p>

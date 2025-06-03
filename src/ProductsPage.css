@@ -348,6 +348,91 @@ body {
     color: var(--color-gray-600);
 }
 
+/* Enhanced styles for the 'No products found' message */
+.message-container.no-products-found {
+    background-color: #ffffff; /* White background */
+    border: 1px solid var(--color-gray-300);
+    box-shadow: var(--shadow-lg); /* Larger shadow */
+    padding: 3rem 2rem; /* Adjusted padding */
+    border-radius: var(--border-radius-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem; /* Increased space between elements */
+    color: var(--color-gray-700);
+}
+
+.no-products-icon {
+    color: var(--color-pink-500); /* Pink color for the icon */
+    margin-bottom: 0.5rem; /* Reduced margin, relying on gap */
+    animation: bounceIn 1s ease-out, pulse 2s infinite ease-in-out; /* Combined animations */
+    transform-origin: center; /* Ensure pulse scales from center */
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0.3);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2); /* Slightly larger bounce */
+        opacity: 1;
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05); /* Subtle pulsing effect */
+    }
+}
+
+.no-products-title {
+    font-size: 2.2rem; /* Larger title */
+    font-weight: 800; /* Bolder font */
+    color: var(--color-neutral-900);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.025em; /* Tighter letter spacing */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1); /* Subtle text shadow */
+}
+
+.no-products-text {
+    font-size: 1.2rem; /* Larger text */
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+    max-width: 600px; /* Wider for readability */
+    color: var(--color-gray-600); /* Consistent gray */
+}
+
+.clear-filters-btn-inline {
+    background-color: var(--color-pink-700);
+    color: #fff;
+    border: none;
+    padding: 0.8rem 1.8rem;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.clear-filters-btn-inline:hover {
+    background-color: var(--color-pink-800);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
 /* --- Product Grid --- */
 /* --- Product Grid --- */
 .products-content-wrapper {

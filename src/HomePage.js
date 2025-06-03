@@ -1,6 +1,6 @@
 // HomePage.js
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link,useLocation  } from 'react-router-dom';
 import './HomePage.css';
 import useScrollReveal from './hooks/useScrollReveal';
 
@@ -10,6 +10,8 @@ import { ChevronRight, Sparkles, Shirt, Crown, User, Mail, Phone, MapPin, Instag
 // Import Firebase
 import { db } from './firebaseConfig';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import aboutus1 from "../src/assets/Gemini_Generated_Image_jprw1njprw1njprw.png";
+import aboutus2 from "../src/assets/Gemini_Generated_Image_mjcef7mjcef7mjce.png";
 
 function HomePage() {
   const [menCategories, setMenCategories] = useState([]);
@@ -30,6 +32,30 @@ function HomePage() {
   // NEW STATE for scroll effect
   const [scrolled, setScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const location = useLocation(); // Get the current location object
+
+
+    useEffect(() => {
+    if (location.hash) {
+      const element = document.getElementById(location.hash.substring(1));
+      if (element) {
+        // Scroll smoothly to the element
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          // After scrolling, remove the hash from the URL
+          // Use replaceState to change the URL without adding a new entry to the browser history
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }, 100); // Small delay to allow scroll to initiate
+      }
+    }
+  }, [location]); // Re-run effect when the location object (specifically the hash) changes
+ // Re-run effect when the location object (specifically the hash) changes
+   useEffect(() => {
+    // Use setTimeout with a small delay to override browser's scroll restoration
+    setTimeout(() => {
+      window.scrollTo(0, 0); // Scroll to the very top (x=0, y=0)
+    }, 0); // A 0ms delay moves it to the end of the current JavaScript execution queue
+  }, []); 
   // Effect for scroll to add/remove 'scrolled' class
   useEffect(() => {
     const handleScroll = () => {
@@ -274,14 +300,15 @@ function HomePage() {
                 Stores Location
                 <span className="nav-link-underline"></span>
               </a>
+              <a href="#how-it-works" className="nav-link group">
+                How It Works
+                <span className="nav-link-underline"></span>
+              </a>
               <a href="#contact" className="nav-link group">
                 Contact Us
                 <span className="nav-link-underline"></span>
               </a>
-              <a href="#rent-with-us" className="nav-link group">
-                Rent with Us
-                <span className="nav-link-underline"></span>
-              </a>
+             
               <a href="#franchise" className="nav-link group">
                 Franchise
                 <span className="nav-link-underline"></span>
@@ -309,7 +336,6 @@ function HomePage() {
               <li><a href="#women" className="mobile-nav-item" onClick={toggleMobileMenu}>Women</a></li>
               <li><a href="#stores-location" className="mobile-nav-item" onClick={toggleMobileMenu}>Stores Location</a></li>
               <li><a href="#contact" className="mobile-nav-item" onClick={toggleMobileMenu}>Contact Us</a></li>
-              <li><a href="#rent-with-us" className="mobile-nav-item" onClick={toggleMobileMenu}>Rent with Us</a></li>
               <li><a href="#franchise" className="mobile-nav-item" onClick={toggleMobileMenu}>Franchise</a></li>
               {/* Mobile CTA Button if desired, or just direct them to sections */}
               <li>
@@ -333,11 +359,11 @@ function HomePage() {
             Step into elegance without compromise. Rent the finest designer wear for your unforgettable moments.
           </p>
           <div className="hero-ultimate-buttons animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-            <Link to="#women" className="cta-button hero-ultimate-button-women">
+            <Link to="/#women" className="cta-button hero-ultimate-button-women">
               Explore Women's Styles
               <ChevronRight size={18} className="icon-right" />
             </Link>
-            <Link to="#men" className="cta-button hero-ultimate-button-men">
+            <Link to="/#men" className="cta-button hero-ultimate-button-men">
               Explore Men's Styles
               <ChevronRight size={18} className="icon-right" />
             </Link>
@@ -562,17 +588,7 @@ function HomePage() {
       </section>
 
       {/* About Us Section */}
-      <section id="about-us" ref={aboutUsRef} className={`section bg-neutral-100 ${aboutUsIsVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'}`}>
-        <div className="container max-width-3xl text-center">
-          <h2 className="section-title">About Dress On Rent(DOR)</h2>
-          <p className="section-description-sub mb-6">
-            At Dress On Rent (DOR), we believe in sustainable fashion without compromising on style. We offer a curated selection of high-quality, fashionable attire for both men and women, making luxury accessible for every special moment.
-          </p>
-          <p className="section-description-sub">
-            With convenient locations in Camp, Wakad (Pune), and Nagpur, we're dedicated to providing an unparalleled rental experience, helping you look your best while being kind to your wallet and the planet.
-          </p>
-        </div>
-      </section>
+
 
       {/* Testimonials Section */}
       <section ref={testimonialsRef} className={`section bg-white ${testimonialsIsVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'}`}>
@@ -612,6 +628,53 @@ function HomePage() {
           </div>
         </div>
       </section>
+     <section id="about-us" ref={aboutUsRef} className={`section bg-neutral-100 ${aboutUsIsVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'}`}>
+    <div className="container max-width-3xl text-center">
+        <h2 className="section-title">About Dress On Rent(DOR)</h2>
+        <div className="container about-us-split-container">
+            <div className="about-us-split-image-wrapper">
+                {/* Images placed directly inside the wrapper */}
+                <img
+                    src={aboutus1}
+                    alt="Dress On Rent Image 1"
+                    className="about-us-split-image"
+                />
+                <img
+                    src={aboutus2} 
+                    alt="Dress On Rent Image 2"
+                    className="about-us-split-image"
+                />
+            </div>
+            <div className="about-us-split-content-wrapper">
+                <h2 className="section-title text-left mb-6">More Than Just Fashion: This is DOR</h2>
+                <p className="about-us-split-text">
+                    Welcome to DOR, where style meets substance. Founded in [Year] from a shared passion for [e.g., sustainable fashion, timeless design, innovative textiles], we embarked on a mission to redefine everyday elegance. We believe that clothing is more than just what you wear; it’s a form of expression, a statement of values, and a companion on your life’s journey.
+                </p>
+                <p className="about-us-split-text">
+                    Our collections are born from a desire to blend [e.g., classic silhouettes with contemporary details, ethical sourcing with luxurious feel]. Each piece is thoughtfully designed and meticulously crafted, ensuring it not only looks exceptional but also feels incredible to wear. We're committed to [mention a core value e.g., quality, sustainability, customer joy].
+                </p>
+                {/* Optional: If you have a more detailed about page */}
+                {/* <Link to="/about-detailed" className="btn btn-primary mt-4">Discover Our Full Story</Link> */}
+                <div className="about-us-split-highlights">
+                    <div className="highlight-item">
+                        <Sparkles size={28} className="highlight-icon text-pink-600" /> {/* Or your brand color */}
+                        <div>
+                            <h4 className="highlight-title">Quality First</h4>
+                            <p className="highlight-text">Crafted for longevity and timeless appeal.</p>
+                        </div>
+                    </div>
+                    <div className="highlight-item">
+                        <Wand2 size={28} className="highlight-icon text-pink-600" /> {/* Or your brand color */}
+                        <div>
+                            <h4 className="highlight-title">Ethical Approach</h4>
+                            <p className="highlight-text">Consciously sourced and responsibly made.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
       {/* Footer */}
       <footer id="contact" className="footer">

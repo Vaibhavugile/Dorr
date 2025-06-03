@@ -6,7 +6,7 @@ import { db } from './firebaseConfig'; // Your initialized Firestore instance
 import { collection, query, where, getDocs, orderBy as firebaseOrderBy } from 'firebase/firestore';
 
 // Import icons from lucide-react
-import { Filter, ListFilter, IndianRupee, ShoppingCart, Loader2, XCircle } from 'lucide-react';
+import { Filter, ListFilter, IndianRupee, ShoppingCart, Loader2, XCircle, ShoppingBag, Clock } from 'lucide-react'; // Added Clock icon
 
 function ProductsPage() {
     const { gender, subcategoryName } = useParams();
@@ -32,7 +32,7 @@ function ProductsPage() {
     const [dynamicStores, setDynamicStores] = useState([]);
     const [dynamicColors, setDynamicColors] = useState([]);
     const [dynamicSizes, setDynamicSizes] = useState([]);
-  
+
 
     // --- Fetch Dynamic Filter Options from Firebase ---
     useEffect(() => {
@@ -311,9 +311,14 @@ function ProductsPage() {
                             <XCircle size={24} className="icon-mr" /> {productError}
                         </p>
                     ) : products.length === 0 ? (
-                        <p className="message-container no-products">
-                            No products found matching your criteria. Try adjusting filters!
-                        </p>
+                        <div className="message-container no-products-found">
+                            <Clock size={60} className="no-products-icon" /> {/* Changed icon to Clock */}
+                            <p className="no-products-title">We will be coming soon!</p>
+                            <p className="no-products-text">
+                                Get ready for an exciting collection! We're busy preparing something special for you.
+                            </p>
+                            {/* Removed the clear filters button for this message */}
+                        </div>
                     ) : (
                         <div className="product-grid">
                             {products.map(product => (
