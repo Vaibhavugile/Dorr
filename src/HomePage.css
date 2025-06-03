@@ -176,7 +176,6 @@
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
 }
-
 .header-logo {
     font-size: 1.8rem; /* text-3xl for prominence */
     font-weight: 700; /* font-bold */
@@ -572,8 +571,6 @@ html {
     color: #171717; /* gray-900 */
     margin-bottom: 0.5rem; /* mb-2 */
 }
-
-
 /* --- Image Slider --- */
 .slider-container {
     position: relative;
@@ -937,11 +934,14 @@ html {
     border-radius: 0.75rem; /* rounded-xl */
     overflow: hidden;
     box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1), 0 4px 8px -4px rgba(0, 0, 0, 0.07); /* shadow-xl variant */
-    
+
     /* --- KEY CHANGES FOR STACKED IMAGES --- */
     display: flex; /* Make it a flex container */
     flex-direction: column; /* Stack children vertically */
     gap: 0.5rem; /* Small gap between the two stacked images */
+    /* SEO Change: Added a fixed height for the wrapper to make child height:50% effective */
+    /* This ensures consistent image sizing across devices. Adjust as needed. */
+    height: 400px; /* Example height: 2 images * 200px each = 400px, plus gap */
     /* --- END KEY CHANGES --- */
 
     align-items: stretch; /* Ensure images stretch to fill width */
@@ -952,6 +952,8 @@ html {
     height: 50%; /* Each image takes 50% of the wrapper's height */
     object-fit: cover; /* Covers the area, might crop */
     display: block;
+    /* SEO Change: Ensure images don't shrink unexpectedly */
+    flex-shrink: 0;
 }
 
 .about-us-split-content-wrapper {
@@ -1018,6 +1020,8 @@ html {
         width: 45%; /* Image section takes up less than half */
         max-width: none; /* Remove mobile max-width */
         order: 1; /* Place image section on the left */
+        /* SEO Change: Adjust height for desktop if needed, or remove if flex-grow handles it */
+        height: auto; /* Allow height to adjust based on content/flex context */
     }
 
     .about-us-split-content-wrapper {
@@ -1301,7 +1305,8 @@ address.address-text {
     background:
         linear-gradient(to right, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2)), /* Darker gradient overlay from left */
         url('C:/Users/vaibh/dor/src/assets/Gemini_Generated_Image_licw8xlicw8xlicw.png') center center / cover no-repeat;
-    /* IMPORTANT: Replace the URL above with your high-resolution hero image! */
+    /* IMPORTANT: REPLACE THE URL ABOVE with your actual high-resolution hero image URL! */
+    /* Local paths like 'C:/Users/...' won't work on a live website. */
     z-index: 1; /* Behind content */
     transform: scale(1.05); /* Slightly scale up for a subtle zoom effect */
     animation: background-pan-zoom 60s linear infinite alternate; /* Slow pan/zoom effect */
@@ -1315,7 +1320,6 @@ address.address-text {
         transform: scale(1.15) translate(5%, 5%);
     }
 }
-
 
 .hero-ultimate-content {
     position: relative;
